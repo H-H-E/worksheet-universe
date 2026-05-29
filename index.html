@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Worksheet Universe</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Worksheet Universe home">
+        <span class="brand-mark">WU</span>
+        <span>
+          <strong>Worksheet Universe</strong>
+          <small>K-12 generator taxonomy</small>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="Page sections">
+        <a href="#sources">Sources</a>
+        <a href="#matrix">Type Matrix</a>
+        <a href="#blueprint">Blueprint</a>
+        <a href="research/source-scan.md">Research Note</a>
+      </nav>
+    </header>
+
+    <main id="top" class="shell">
+      <aside class="control-panel" aria-label="Worksheet filters">
+        <div class="panel-block">
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="search" placeholder="fractions, SEL, spelling, lab...">
+        </div>
+
+        <div class="panel-block">
+          <div class="label-row">
+            <span>Grade</span>
+            <button class="text-button" id="clearGrade" type="button">All</button>
+          </div>
+          <div class="grade-grid" id="gradeFilters" aria-label="Grade filters"></div>
+        </div>
+
+        <div class="panel-block">
+          <div class="label-row">
+            <span>Subject</span>
+            <button class="text-button" id="clearSubject" type="button">All</button>
+          </div>
+          <div class="pill-stack" id="subjectFilters" aria-label="Subject filters"></div>
+        </div>
+
+        <div class="panel-block">
+          <div class="label-row">
+            <span>Source Signal</span>
+            <button class="text-button" id="clearSource" type="button">All</button>
+          </div>
+          <div class="pill-stack" id="sourceFilters" aria-label="Source filters"></div>
+        </div>
+
+        <div class="score-tile">
+          <span id="visibleCount">0</span>
+          <small>visible worksheet types</small>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <section class="intro-grid" aria-labelledby="pageTitle">
+          <div class="intro-copy">
+            <p class="eyebrow">Source scan to original generator spec</p>
+            <h1 id="pageTitle">Every worksheet type starts as a reusable pattern.</h1>
+            <p>
+              This prototype turns public category structures from worksheet sites into an
+              original generator roadmap. The goal is to improve on existing libraries with
+              deeper controls, better accommodations, and broader grade coverage.
+            </p>
+          </div>
+          <div class="paper-stack" aria-hidden="true">
+            <div class="paper paper-a">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="paper paper-b">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="paper paper-c">
+              <span></span><span></span>
+            </div>
+          </div>
+        </section>
+
+        <section id="sources" aria-labelledby="sourcesTitle">
+          <div class="section-heading">
+            <p class="eyebrow">Scraped category signals</p>
+            <h2 id="sourcesTitle">Source Scorecards</h2>
+          </div>
+          <div class="source-grid" id="sourceCards"></div>
+        </section>
+
+        <section aria-labelledby="opportunitiesTitle">
+          <div class="section-heading">
+            <p class="eyebrow">What to build better</p>
+            <h2 id="opportunitiesTitle">Improvement Ideas</h2>
+          </div>
+          <div class="opportunity-board" id="opportunityBoard"></div>
+        </section>
+
+        <section id="matrix" aria-labelledby="matrixTitle">
+          <div class="section-heading section-heading-row">
+            <div>
+              <p class="eyebrow">Generator inventory</p>
+              <h2 id="matrixTitle">Worksheet Type Matrix</h2>
+            </div>
+            <button class="ghost-button" id="resetFilters" type="button">Reset filters</button>
+          </div>
+          <div class="type-grid" id="typeGrid"></div>
+        </section>
+      </section>
+
+      <aside id="blueprint" class="blueprint-panel" aria-live="polite">
+        <div class="blueprint-card">
+          <p class="eyebrow">Selected generator</p>
+          <h2 id="blueprintTitle">Choose a worksheet type</h2>
+          <p id="blueprintSummary">Select any card to see the controls our website should expose.</p>
+          <div class="blueprint-meta" id="blueprintMeta"></div>
+          <div class="blueprint-list">
+            <h3>Generator Controls</h3>
+            <ul id="controlList"></ul>
+          </div>
+          <div class="blueprint-list">
+            <h3>Differentiation Hooks</h3>
+            <ul id="hookList"></ul>
+          </div>
+          <div class="blueprint-actions">
+            <button id="printBlueprint" type="button">Print spec</button>
+            <button id="copyBlueprint" type="button">Copy prompt</button>
+          </div>
+          <p class="copy-status" id="copyStatus" role="status"></p>
+        </div>
+      </aside>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
