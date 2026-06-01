@@ -1,0 +1,22 @@
+{
+  "id": "010-markdown-export",
+  "title": "Add Markdown export",
+  "branch": "agent/010-markdown-export",
+  "priority": 10,
+  "status": "pending",
+  "lane": "rendering",
+  "allowed_paths": ["src/export", "tests/export", "docs"],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Export worksheet JSON to Markdown for student worksheet, answer key, and teacher notes.",
+  "context": "Markdown is useful for open source review, version control, and low-friction sharing.",
+  "acceptance": [
+    "Student Markdown export includes frontmatter metadata",
+    "Answer key Markdown export exists",
+    "Teacher notes Markdown export exists",
+    "Tables, code blocks, and math blocks are handled or explicitly documented"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "npm run test", "npm run build"],
+  "max_attempts": 2,
+  "depends_on": ["004-html-renderer"],
+  "notes": "Do not build DOCX or Google Docs export in this task."
+}

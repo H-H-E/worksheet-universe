@@ -1,0 +1,23 @@
+{
+  "id": "008-editor-ui",
+  "title": "Create teacher editor UI",
+  "branch": "agent/008-editor-ui",
+  "priority": 8,
+  "status": "pending",
+  "lane": "frontend",
+  "allowed_paths": ["src/app", "app", "pages", "components", "tests/e2e"],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Build the teacher editor UI for title, instructions, questions, answers, and live preview updates.",
+  "context": "The worksheet should always be editable before export. Do not treat generated output as sacred.",
+  "acceptance": [
+    "Teacher can edit title and instructions",
+    "Teacher can edit question prompt and expected answer",
+    "Teacher can add, duplicate, and delete questions",
+    "Preview updates after edits",
+    "E2E or component test covers the edit flow"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "npm run test", "npm run build"],
+  "max_attempts": 2,
+  "depends_on": ["004-html-renderer", "007-answer-checking"],
+  "notes": "Keep UI practical and dense. Do not add accounts or collaboration."
+}

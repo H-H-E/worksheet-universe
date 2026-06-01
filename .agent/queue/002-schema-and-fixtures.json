@@ -1,0 +1,24 @@
+{
+  "id": "002-schema-and-fixtures",
+  "title": "Create canonical worksheet schema and fixtures",
+  "branch": "agent/002-schema-and-fixtures",
+  "priority": 2,
+  "status": "pending",
+  "lane": "core",
+  "allowed_paths": ["src/schema", "src/types", "tests/fixtures", "docs"],
+  "forbidden_paths": [".git", "node_modules", ".env", "app.js", "index.html", "styles.css"],
+  "goal": "Create the canonical Worksheet TypeScript type, Zod schema if the eventual TS stack supports it, JSON schema, and fixture worksheets.",
+  "context": "JSON is the source of truth for worksheet generation, editing, rendering, answer keys, and exports.",
+  "acceptance": [
+    "At least 3 fixture worksheets validate successfully",
+    "At least 1 malformed fixture test fails validation",
+    "Schema includes worksheet, section, question, answer key, and metadata",
+    "Worksheet schema includes id, title, subject, gradeBand, topic, learningGoals, instructions, sections, answerKey, and metadata",
+    "Question schema includes the required worksheet compiler question type enum",
+    "Schema documents versioning and migration expectations"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "node tests/fixtures/validate-fixtures.mjs"],
+  "max_attempts": 2,
+  "depends_on": ["001-inspect-repo"],
+  "notes": "If no TypeScript stack exists yet, add JSON schema and documented TypeScript definitions without converting the app."
+}

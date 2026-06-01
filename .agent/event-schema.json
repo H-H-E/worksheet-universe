@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Worksheet Universe Agent Lifecycle Event",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["at", "type"],
+  "properties": {
+    "at": { "type": "string" },
+    "type": { "type": "string", "minLength": 1 },
+    "task_id": { "type": "string", "minLength": 1 },
+    "command": { "type": "string", "minLength": 1 },
+    "duration_ms": { "type": "number", "minimum": 0 },
+    "elapsed_ms": { "type": "number", "minimum": 0 },
+    "timeout_minutes": { "type": "number", "minimum": 0 },
+    "code": { "type": "integer" },
+    "timed_out": { "type": "boolean" },
+    "log": { "type": "string", "minLength": 1 },
+    "prompt_file": { "type": "string", "minLength": 1 },
+    "stdout": { "type": "string", "minLength": 1 },
+    "stderr": { "type": "string", "minLength": 1 },
+    "output": { "type": "string", "minLength": 1 },
+    "result_copy": { "type": "string", "minLength": 1 },
+    "task_contract_file": { "type": "string", "minLength": 1 }
+  }
+}

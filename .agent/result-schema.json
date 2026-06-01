@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Worksheet Universe Agent Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "status",
+    "summary",
+    "files_changed",
+    "commands_run",
+    "acceptance_results",
+    "remaining_work"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "pattern": "^\\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["passed", "failed", "partial", "blocked"]
+    },
+    "summary": { "type": "string" },
+    "files_changed": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "commands_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "status", "notes"],
+        "properties": {
+          "command": { "type": "string" },
+          "status": { "type": "string", "enum": ["passed", "failed", "skipped"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "acceptance_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["criterion", "status", "notes"],
+        "properties": {
+          "criterion": { "type": "string" },
+          "status": { "type": "string", "enum": ["passed", "failed", "partial", "blocked", "unverified"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "remaining_work": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "next_recommended_task": {
+      "type": ["string", "null"],
+      "pattern": "^\\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*$"
+    }
+  }
+}

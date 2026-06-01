@@ -1,0 +1,64 @@
+{
+  "task_id": "013-teacher-library-front-end",
+  "status": "passed",
+  "summary": "Built a teacher-first static worksheet library with exact-grade filtering, search, format choices, and 139 deterministic K-12 math worksheet types.",
+  "files_changed": [
+    ".agent/queue/013-teacher-library-front-end.json",
+    ".agent/reports/013-teacher-library-front-end.md",
+    ".agent/reports/013-teacher-library-front-end.result.json",
+    "README.md",
+    "app.js",
+    "index.html",
+    "scripts/verify-generators.js",
+    "styles.css"
+  ],
+  "commands_run": [
+    {
+      "command": "node scripts/verify-generators.js",
+      "status": "passed",
+      "notes": "Checked 139 worksheet types and 834 generated items with no failed audits."
+    },
+    {
+      "command": "node scripts/agent-validate.mjs",
+      "status": "passed",
+      "notes": "Harness validation passed; it reported warnings for ready tasks sharing .agent/reports and for the manual result status not being reflected in .agent/state.json."
+    }
+  ],
+  "acceptance_results": [
+    {
+      "criterion": "Teachers can filter worksheet types by exact grade from Pre-K/K through grade 12",
+      "status": "passed",
+      "notes": "Added exact-grade filter controls for Pre-K, K, and grades 1-12."
+    },
+    {
+      "criterion": "Search and grade/type filters work together without removing the current printable worksheet preview",
+      "status": "passed",
+      "notes": "Search, exact grade, grade band, strand, and format filters combine in getFilteredTypes while the worksheet preview remains rendered."
+    },
+    {
+      "criterion": "Clicking a worksheet type exposes multiple worksheet format choices and regenerates the preview in the chosen format",
+      "status": "passed",
+      "notes": "Selected generator panel now shows available formats; selecting a format updates worksheet metadata and format-specific layout classes."
+    },
+    {
+      "criterion": "Worksheet inventory includes at least 90 generator entries across K-12 math",
+      "status": "passed",
+      "notes": "Inventory now contains 139 unique worksheet type ids across K-12."
+    },
+    {
+      "criterion": "The static app still runs by opening index.html without an install step",
+      "status": "passed",
+      "notes": "No package or dependency step was added; app remains static HTML/CSS/JS."
+    },
+    {
+      "criterion": "Generator verification passes for every worksheet type",
+      "status": "passed",
+      "notes": "node scripts/verify-generators.js passed for 139 worksheet types and 834 generated items."
+    }
+  ],
+  "remaining_work": [],
+  "risks": [
+    "Many new worksheet types currently reuse the closest existing deterministic generator kind; future tasks should add more specialized problem generators for richer prompt variety."
+  ],
+  "next_recommended_task": "006-math-generators"
+}

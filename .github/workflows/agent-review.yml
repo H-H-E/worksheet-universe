@@ -1,0 +1,45 @@
+name: Agent Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  codex-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # Configure OPENAI_API_KEY as a GitHub Actions secret before enabling this review job.
+      - name: Run Codex review
+        if: ${{ env.OPENAI_API_KEY != '' }}
+        uses: openai/codex-action@v1
+        with:
+          prompt-file: .github/codex/prompts/review.md
+          sandbox: read-only
+          output-file: codex-output.md
+
+      - name: Missing secret notice
+        if: ${{ env.OPENAI_API_KEY == '' }}
+        shell: bash
+        run: |
+          cat > codex-output.md <<'NOTICE'
+          Codex review did not run because OPENAI_API_KEY is not configured.
+          Add OPENAI_API_KEY as a GitHub Actions secret to enable agent review.
+          NOTICE
+
+      - name: Upload Codex output
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-output
+          path: codex-output.md

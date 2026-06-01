@@ -1,0 +1,25 @@
+{
+  "id": "005-print-css",
+  "title": "Add printable worksheet CSS",
+  "branch": "agent/005-print-css",
+  "priority": 5,
+  "status": "pending",
+  "lane": "rendering",
+  "allowed_paths": ["src/styles", "src/renderers", "public", "tests/e2e"],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Create print CSS for worksheet HTML exports and browser print-to-PDF.",
+  "context": "Print export should be CSS over the same worksheet content, not a separate content system.",
+  "acceptance": [
+    "Name/date/class fields render on student pages",
+    "@media print stylesheet exists",
+    "Student mode hides answer key",
+    "Questions avoid splitting across pages",
+    "Letter and A4 page size options are documented or represented",
+    "Large-font, dyslexia-friendly, and black-and-white printer modes are represented",
+    "Page-break controls include one-question-per-page support or a documented hook"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "npm run test", "npm run build"],
+  "max_attempts": 2,
+  "depends_on": ["004-html-renderer"],
+  "notes": "Do not implement custom PDF generation in this task."
+}

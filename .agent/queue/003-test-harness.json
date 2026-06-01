@@ -1,0 +1,22 @@
+{
+  "id": "003-test-harness",
+  "title": "Ensure repo test commands exist",
+  "branch": "agent/003-test-harness",
+  "priority": 3,
+  "status": "pending",
+  "lane": "core",
+  "allowed_paths": ["package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "vitest.config.ts", "vitest.config.js", "jest.config.js", "tests", "src", "docs"],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Ensure lint, typecheck, test, and build scripts exist or add minimal equivalents compatible with the chosen stack.",
+  "context": "Tests are the truth. Keep the harness boring and do not create a full app migration unless the repo map calls for it.",
+  "acceptance": [
+    "One command validates worksheet fixtures",
+    "CI can run available checks without calling missing scripts",
+    "package.json scripts exist if package.json is introduced",
+    "Test setup is documented in docs/testing.md"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "npm run lint", "npm run typecheck", "npm run test", "npm run build"],
+  "max_attempts": 2,
+  "depends_on": ["001-inspect-repo", "002-schema-and-fixtures"],
+  "notes": "Do not add dependencies unless they are justified by the test harness."
+}

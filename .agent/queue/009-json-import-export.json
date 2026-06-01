@@ -1,0 +1,23 @@
+{
+  "id": "009-json-import-export",
+  "title": "Add JSON import and export",
+  "branch": "agent/009-json-import-export",
+  "priority": 9,
+  "status": "pending",
+  "lane": "core",
+  "allowed_paths": ["src/export", "src/import", "components", "tests"],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Add import and export for canonical worksheet JSON with schema validation on import.",
+  "context": "JSON is the actual source of truth and should round-trip without losing worksheet content.",
+  "acceptance": [
+    "User can download worksheet JSON",
+    "User can import worksheet JSON",
+    "Imported JSON validates against schema before entering app state",
+    "Invalid JSON shows a useful error and does not corrupt current worksheet",
+    "Round-trip preserves schema/version metadata and does not export UI-only state"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "npm run test", "npm run build"],
+  "max_attempts": 2,
+  "depends_on": ["002-schema-and-fixtures", "004-html-renderer"],
+  "notes": "Do not add cloud storage or accounts."
+}

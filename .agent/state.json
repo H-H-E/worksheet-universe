@@ -1,0 +1,11 @@
+{
+  "started_at": null,
+  "updated_at": null,
+  "current_task": null,
+  "completed": [],
+  "failed": [],
+  "partial": [],
+  "blocked": [],
+  "attempts": {},
+  "last_run_summary": null
+}

@@ -1,0 +1,32 @@
+{
+  "id": "013-teacher-library-front-end",
+  "title": "Build teacher worksheet discovery front end",
+  "branch": "agent/013-teacher-library-front-end",
+  "priority": 13,
+  "status": "pending",
+  "lane": "frontend",
+  "allowed_paths": [
+    ".agent/queue",
+    ".agent/reports",
+    "README.md",
+    "app.js",
+    "index.html",
+    "scripts/verify-generators.js",
+    "styles.css"
+  ],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Turn the static prototype into a teacher-first worksheet library front end with exact-grade discovery, search, format selection, and broad K-12 math worksheet coverage.",
+  "context": "The repo is currently a static HTML/CSS/JS math generator lab. Teachers should be able to quickly choose an exact grade, search by skill, click a worksheet type, choose from useful worksheet formats, and preview printable/digital worksheet instances generated from deterministic math logic.",
+  "acceptance": [
+    "Teachers can filter worksheet types by exact grade from Pre-K/K through grade 12",
+    "Search and grade/type filters work together without removing the current printable worksheet preview",
+    "Clicking a worksheet type exposes multiple worksheet format choices and regenerates the preview in the chosen format",
+    "Worksheet inventory includes at least 90 generator entries across K-12 math",
+    "The static app still runs by opening index.html without an install step",
+    "Generator verification passes for every worksheet type"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "node scripts/verify-generators.js"],
+  "max_attempts": 1,
+  "depends_on": [],
+  "notes": "Do not add accounts, auth, payments, databases, LMS integrations, PDF generation, or npm dependencies. Keep worksheet generation deterministic and self-checkable."
+}

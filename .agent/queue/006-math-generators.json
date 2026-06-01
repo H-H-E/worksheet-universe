@@ -1,0 +1,24 @@
+{
+  "id": "006-math-generators",
+  "title": "Build deterministic math generators",
+  "branch": "agent/006-math-generators",
+  "priority": 6,
+  "status": "pending",
+  "lane": "core",
+  "allowed_paths": ["src/generators", "tests/generators", "tests/fixtures"],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Create deterministic math problem generators that return problem text, variables, correct answer, worked solution, difficulty, and tags.",
+  "context": "For math, code generates the problem and answer. LLMs may style text later but must not be the calculator.",
+  "acceptance": [
+    "Generators return problem text, variables, correct answer, worked solution, difficulty, tags, and seed/lineage metadata",
+    "Fractions generator has seeded tests and correct answers",
+    "Percents generator has seeded tests and correct answers",
+    "Probability generator has seeded tests and correct answers",
+    "Linear equations generator has seeded tests and correct answers",
+    "Area/perimeter generator has seeded tests and correct answers"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "npm run test", "npm run build"],
+  "max_attempts": 2,
+  "depends_on": ["002-schema-and-fixtures", "003-test-harness"],
+  "notes": "Keep generator plugins small and reproducible by seed."
+}

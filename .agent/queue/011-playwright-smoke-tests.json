@@ -1,0 +1,24 @@
+{
+  "id": "011-playwright-smoke-tests",
+  "title": "Add Playwright smoke tests",
+  "branch": "agent/011-playwright-smoke-tests",
+  "priority": 11,
+  "status": "pending",
+  "lane": "frontend",
+  "allowed_paths": ["tests/e2e", "playwright.config.ts", "playwright.config.js", "package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb"],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Add end-to-end smoke tests for the core worksheet compiler flow.",
+  "context": "E2E tests should verify the complete story from creation to edit to export preview.",
+  "acceptance": [
+    "Smoke test creates a worksheet",
+    "Smoke test edits a question",
+    "Smoke test exports or triggers export",
+    "Smoke test verifies student preview renders",
+    "Smoke test verifies print preview opens or print mode renders",
+    "Playwright config is minimal and documented"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "npm run test:e2e", "npm run build"],
+  "max_attempts": 2,
+  "depends_on": ["008-editor-ui", "009-json-import-export"],
+  "notes": "Do not add parallel browser matrix testing in this task."
+}

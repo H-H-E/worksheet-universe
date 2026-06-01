@@ -3,132 +3,185 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Worksheet Universe</title>
+    <title>Worksheet Universe Teacher Library</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#top" aria-label="Worksheet Universe home">
+      <a class="brand" href="#top" aria-label="Worksheet Universe Teacher Library home">
         <span class="brand-mark">WU</span>
         <span>
           <strong>Worksheet Universe</strong>
-          <small>K-12 generator taxonomy</small>
+          <small>Teacher worksheet library</small>
         </span>
       </a>
       <nav class="topnav" aria-label="Page sections">
-        <a href="#sources">Sources</a>
-        <a href="#matrix">Type Matrix</a>
-        <a href="#blueprint">Blueprint</a>
-        <a href="research/source-scan.md">Research Note</a>
+        <a href="#agents">Agent Team</a>
+        <a href="#gradeMap">Grade Map</a>
+        <a href="#matrix">Math Types</a>
+        <a href="#worksheet">Worksheet</a>
+        <a href="research/source-scan.md">Research</a>
       </nav>
     </header>
 
     <main id="top" class="shell">
-      <aside class="control-panel" aria-label="Worksheet filters">
+      <aside class="control-panel" aria-label="Worksheet generator filters">
         <div class="panel-block">
           <label for="searchInput">Search</label>
-          <input id="searchInput" type="search" placeholder="fractions, SEL, spelling, lab...">
+          <input id="searchInput" type="search" placeholder="fractions, slope, money, graphing...">
         </div>
 
         <div class="panel-block">
           <div class="label-row">
-            <span>Grade</span>
+            <span>Exact Grade</span>
             <button class="text-button" id="clearGrade" type="button">All</button>
           </div>
-          <div class="grade-grid" id="gradeFilters" aria-label="Grade filters"></div>
+          <div class="grade-button-grid" id="exactGradeFilters" aria-label="Exact grade filters"></div>
         </div>
 
         <div class="panel-block">
           <div class="label-row">
-            <span>Subject</span>
-            <button class="text-button" id="clearSubject" type="button">All</button>
+            <span>Grade Band</span>
+            <button class="text-button" id="clearBand" type="button">All</button>
           </div>
-          <div class="pill-stack" id="subjectFilters" aria-label="Subject filters"></div>
+          <div class="pill-stack" id="gradeBandFilters" aria-label="Grade band filters"></div>
         </div>
 
         <div class="panel-block">
           <div class="label-row">
-            <span>Source Signal</span>
-            <button class="text-button" id="clearSource" type="button">All</button>
+            <span>Topic Strand</span>
+            <button class="text-button" id="clearStrand" type="button">All</button>
           </div>
-          <div class="pill-stack" id="sourceFilters" aria-label="Source filters"></div>
+          <div class="pill-stack" id="strandFilters" aria-label="Math strand filters"></div>
+        </div>
+
+        <div class="panel-block">
+          <div class="label-row">
+            <span>HTML Format</span>
+            <button class="text-button" id="clearFormat" type="button">All</button>
+          </div>
+          <div class="pill-stack" id="formatFilters" aria-label="Worksheet format filters"></div>
+        </div>
+
+        <div class="panel-block two-field-grid">
+          <label for="itemCount">Items</label>
+          <input id="itemCount" type="number" min="3" max="12" value="6">
+          <label for="seedInput">Seed</label>
+          <input id="seedInput" type="number" min="1" max="9999" value="42">
         </div>
 
         <div class="score-tile">
           <span id="visibleCount">0</span>
-          <small>visible worksheet types</small>
+          <small>math generators</small>
         </div>
       </aside>
 
       <section class="workspace">
         <section class="intro-grid" aria-labelledby="pageTitle">
           <div class="intro-copy">
-            <p class="eyebrow">Source scan to original generator spec</p>
-            <h1 id="pageTitle">Every worksheet type starts as a reusable pattern.</h1>
+            <p class="eyebrow">Math-only HTML worksheet engine</p>
+            <h1 id="pageTitle">Find the exact math worksheet, then make it yours.</h1>
             <p>
-              This prototype turns public category structures from worksheet sites into an
-              original generator roadmap. The goal is to improve on existing libraries with
-              deeper controls, better accommodations, and broader grade coverage.
+              Pick a grade, search a skill, choose a format, and generate a printable or
+              self-checking worksheet with an audited answer key.
             </p>
+            <div class="coverage-strip" aria-label="Worksheet library coverage">
+              <span><strong id="totalTypeCount">0</strong> worksheet types</span>
+              <span><strong>14</strong> grade stops</span>
+              <span><strong id="totalFormatCount">0</strong> formats</span>
+            </div>
           </div>
-          <div class="paper-stack" aria-hidden="true">
-            <div class="paper paper-a">
-              <span></span><span></span><span></span>
+          <div class="audit-panel" aria-label="Current generator status">
+            <div>
+              <small>Selected</small>
+              <strong id="statusType">-</strong>
             </div>
-            <div class="paper paper-b">
-              <span></span><span></span><span></span><span></span>
+            <div>
+              <small>Answer Audit</small>
+              <strong id="statusAudit">Not run</strong>
             </div>
-            <div class="paper paper-c">
-              <span></span><span></span>
+            <div>
+              <small>Digital Mode</small>
+              <strong>Self-checking</strong>
             </div>
           </div>
         </section>
 
-        <section id="sources" aria-labelledby="sourcesTitle">
+        <section id="agents" aria-labelledby="agentsTitle">
           <div class="section-heading">
-            <p class="eyebrow">Scraped category signals</p>
-            <h2 id="sourcesTitle">Source Scorecards</h2>
+            <p class="eyebrow">Generation ownership</p>
+            <h2 id="agentsTitle">Subagent Operating Model</h2>
           </div>
-          <div class="source-grid" id="sourceCards"></div>
+          <div class="agent-grid" id="agentGrid"></div>
         </section>
 
-        <section aria-labelledby="opportunitiesTitle">
+        <section id="gradeMap" aria-labelledby="gradeMapTitle">
           <div class="section-heading">
-            <p class="eyebrow">What to build better</p>
-            <h2 id="opportunitiesTitle">Improvement Ideas</h2>
+            <p class="eyebrow">Curriculum routing</p>
+            <h2 id="gradeMapTitle">Grade Bands and Topic Strands</h2>
           </div>
-          <div class="opportunity-board" id="opportunityBoard"></div>
+          <div class="grade-map" id="gradeMapGrid"></div>
+        </section>
+
+        <section id="formats" aria-labelledby="formatsTitle">
+          <div class="section-heading">
+            <p class="eyebrow">HTML page systems</p>
+            <h2 id="formatsTitle">Worksheet Format Families</h2>
+          </div>
+          <div class="format-grid" id="formatGrid"></div>
         </section>
 
         <section id="matrix" aria-labelledby="matrixTitle">
           <div class="section-heading section-heading-row">
             <div>
               <p class="eyebrow">Generator inventory</p>
-              <h2 id="matrixTitle">Worksheet Type Matrix</h2>
+              <h2 id="matrixTitle">Math Worksheet Types</h2>
             </div>
             <button class="ghost-button" id="resetFilters" type="button">Reset filters</button>
           </div>
           <div class="type-grid" id="typeGrid"></div>
+        </section>
+
+        <section id="worksheet" aria-labelledby="worksheetTitle">
+          <div class="section-heading section-heading-row">
+            <div>
+              <p class="eyebrow">Generated HTML worksheet</p>
+              <h2 id="worksheetTitle">Printable and Digital Preview</h2>
+            </div>
+            <div class="action-row">
+              <button class="ghost-button" id="generateWorksheet" type="button">Generate</button>
+              <button class="ghost-button" id="checkAnswers" type="button">Check answers</button>
+              <button class="ghost-button" id="printWorksheet" type="button">Print</button>
+            </div>
+          </div>
+          <div class="worksheet-stage" id="worksheetStage"></div>
         </section>
       </section>
 
       <aside id="blueprint" class="blueprint-panel" aria-live="polite">
         <div class="blueprint-card">
           <p class="eyebrow">Selected generator</p>
-          <h2 id="blueprintTitle">Choose a worksheet type</h2>
-          <p id="blueprintSummary">Select any card to see the controls our website should expose.</p>
+          <h2 id="blueprintTitle">Choose a math type</h2>
+          <p id="blueprintSummary">Select any card to inspect generation controls and validation rules.</p>
           <div class="blueprint-meta" id="blueprintMeta"></div>
+          <div class="blueprint-list">
+            <h3>Worksheet Formats</h3>
+            <div class="format-choice-grid" id="formatOptionList"></div>
+          </div>
           <div class="blueprint-list">
             <h3>Generator Controls</h3>
             <ul id="controlList"></ul>
           </div>
           <div class="blueprint-list">
-            <h3>Differentiation Hooks</h3>
-            <ul id="hookList"></ul>
+            <h3>Validation Rules</h3>
+            <ul id="validationList"></ul>
+          </div>
+          <div class="blueprint-list">
+            <h3>Step Solutions</h3>
+            <p id="solutionSummary"></p>
           </div>
           <div class="blueprint-actions">
-            <button id="printBlueprint" type="button">Print spec</button>
-            <button id="copyBlueprint" type="button">Copy prompt</button>
+            <button id="copyBlueprint" type="button">Copy spec</button>
           </div>
           <p class="copy-status" id="copyStatus" role="status"></p>
         </div>

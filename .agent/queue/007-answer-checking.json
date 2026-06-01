@@ -1,0 +1,22 @@
+{
+  "id": "007-answer-checking",
+  "title": "Implement answer checking",
+  "branch": "agent/007-answer-checking",
+  "priority": 7,
+  "status": "pending",
+  "lane": "core",
+  "allowed_paths": ["src/checking", "tests/checking"],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Implement answer checking for multiple choice, numeric, and short-answer questions.",
+  "context": "Answer checking should return a clear result object that UI and exports can use without guessing.",
+  "acceptance": [
+    "Exact matching is tested",
+    "Numeric tolerance is tested",
+    "Normalized text matching is tested",
+    "Checker returns clear status, expected answer, normalized input, and notes"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "npm run test", "npm run build"],
+  "max_attempts": 2,
+  "depends_on": ["002-schema-and-fixtures", "003-test-harness"],
+  "notes": "Do not grade long-form writing with AI in this task."
+}

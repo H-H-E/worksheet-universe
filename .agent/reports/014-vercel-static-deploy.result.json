@@ -1,0 +1,62 @@
+{
+  "task_id": "014-vercel-static-deploy",
+  "status": "passed",
+  "summary": "Added minimal Vercel static deployment config with clean URLs, security headers, safe cache revalidation, and deploy ignore rules for harness runtime output.",
+  "files_changed": [
+    ".agent/queue/014-vercel-static-deploy.json",
+    ".agent/reports/014-vercel-static-deploy.md",
+    ".agent/reports/014-vercel-static-deploy.result.json",
+    ".vercelignore",
+    "README.md",
+    "vercel.json"
+  ],
+  "commands_run": [
+    {
+      "command": "node scripts/agent-validate.mjs",
+      "status": "passed",
+      "notes": "Harness validation passed with warnings for manual result-state mismatch and ready task path overlaps."
+    },
+    {
+      "command": "node scripts/verify-generators.js",
+      "status": "passed",
+      "notes": "Checked 139 worksheet types and 834 generated items with no failed audits."
+    }
+  ],
+  "acceptance_results": [
+    {
+      "criterion": "Vercel configuration exists for static deployment without adding framework dependencies",
+      "status": "passed",
+      "notes": "Added vercel.json for static deployment behavior without package or framework dependencies."
+    },
+    {
+      "criterion": "Vercel configuration does not commit project IDs, tokens, or .vercel/project.json",
+      "status": "passed",
+      "notes": "No .vercel/project.json exists, and no tokens or project IDs were added."
+    },
+    {
+      "criterion": "Security headers are configured for static routes",
+      "status": "passed",
+      "notes": "Configured X-Content-Type-Options, Referrer-Policy, and Permissions-Policy on all routes."
+    },
+    {
+      "criterion": "Non-hashed static assets use revalidation-safe cache headers",
+      "status": "passed",
+      "notes": "Configured max-age=0, must-revalidate for /, /index.html, /app.js, and /styles.css."
+    },
+    {
+      "criterion": "Vercel ignore rules exclude harness runtime noise from deployments",
+      "status": "passed",
+      "notes": ".vercelignore excludes .agent/logs, .agent/tmp, .agent/reports, .vercel, node_modules, and package-manager debug logs."
+    },
+    {
+      "criterion": "Generator verification still passes",
+      "status": "passed",
+      "notes": "node scripts/verify-generators.js passed for 139 worksheet types and 834 generated items."
+    }
+  ],
+  "remaining_work": [],
+  "risks": [
+    "No Vercel project remote is linked in this checkout; deployment will need a configured Git remote/Vercel project outside source control."
+  ],
+  "next_recommended_task": null
+}

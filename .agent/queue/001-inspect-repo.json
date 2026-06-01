@@ -1,0 +1,22 @@
+{
+  "id": "001-inspect-repo",
+  "title": "Inspect repo and produce implementation map",
+  "branch": "agent/001-inspect-repo",
+  "priority": 1,
+  "status": "pending",
+  "lane": "docs",
+  "allowed_paths": ["docs", ".agent/reports"],
+  "forbidden_paths": ["app.js", "index.html", "styles.css", ".git", "node_modules", ".env"],
+  "goal": "Inspect the repository and produce a concise implementation map for the worksheet compiler roadmap.",
+  "context": "This repo is a static worksheet prototype today. The product architecture to implement later is teacher input -> worksheet JSON -> editable preview -> exports -> tests.",
+  "acceptance": [
+    "Repo structure summary is written to docs/implementation-map.md",
+    "Package manager is identified or documented as none",
+    "App framework is identified or documented as plain static HTML/CSS/JS",
+    "Recommended build order is listed with dependencies and test gates"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "node scripts/agent-doctor.mjs"],
+  "max_attempts": 1,
+  "depends_on": [],
+  "notes": "Do not edit application code in this task."
+}

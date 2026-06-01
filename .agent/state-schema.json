@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worksheet-universe.local/agent/state-schema.json",
+  "title": "Agent Runner State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "started_at",
+    "updated_at",
+    "current_task",
+    "completed",
+    "failed",
+    "partial",
+    "blocked",
+    "attempts",
+    "last_run_summary"
+  ],
+  "properties": {
+    "started_at": {
+      "type": ["string", "null"],
+      "description": "ISO-compatible timestamp for the first runner start, or null before any run."
+    },
+    "updated_at": {
+      "type": ["string", "null"],
+      "description": "ISO-compatible timestamp for the latest state write, or null before any run."
+    },
+    "current_task": {
+      "type": ["string", "null"],
+      "description": "Task id currently owned by the runner, or null when idle."
+    },
+    "completed": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "failed": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "partial": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "blocked": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "attempts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "last_run_summary": {
+      "type": ["string", "null"]
+    }
+  }
+}

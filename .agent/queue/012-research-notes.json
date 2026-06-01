@@ -1,0 +1,26 @@
+{
+  "id": "012-research-notes",
+  "title": "Write competitor and export-format research notes",
+  "branch": "agent/012-research-notes",
+  "priority": 12,
+  "status": "pending",
+  "lane": "docs",
+  "allowed_paths": ["docs/research"],
+  "forbidden_paths": [".git", "node_modules", ".env", "app.js", "index.html", "styles.css"],
+  "goal": "Create concise competitor and export-format research notes for future product decisions.",
+  "context": "Research should be just enough to avoid building the wrong thing. Do not copy worksheet content.",
+  "acceptance": [
+    "docs/research/competitor-notes.md exists",
+    "docs/research/teacher-pain-points.md exists",
+    "docs/research/export-format-comparison.md exists",
+    "Notes cover HTML export",
+    "Notes cover print PDF through browser print",
+    "Notes cover LaTeX/PDF as a later layer",
+    "Notes cover DOCX, Markdown, JSON, and LMS exports",
+    "Notes cover existing worksheet tools and pain points"
+  ],
+  "commands": ["node scripts/agent-validate.mjs"],
+  "max_attempts": 1,
+  "depends_on": ["001-inspect-repo"],
+  "notes": "Use source links and concise summaries. Avoid adding app features."
+}

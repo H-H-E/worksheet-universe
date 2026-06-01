@@ -1,0 +1,30 @@
+{
+  "id": "014-vercel-static-deploy",
+  "title": "Optimize static app for Vercel deployment",
+  "branch": "agent/014-vercel-static-deploy",
+  "priority": 14,
+  "status": "pending",
+  "lane": "frontend",
+  "allowed_paths": [
+    ".agent/queue",
+    ".agent/reports",
+    ".vercelignore",
+    "README.md",
+    "vercel.json"
+  ],
+  "forbidden_paths": [".git", "node_modules", ".env", ".vercel/project.json"],
+  "goal": "Add minimal Vercel deployment configuration for the static Worksheet Universe app without adding framework dependencies or secrets.",
+  "context": "The app is plain static HTML/CSS/JS and should remain openable by index.html. Vercel optimization should focus on safe static hosting defaults, security headers, clean URLs, and avoiding upload of harness runtime files.",
+  "acceptance": [
+    "Vercel configuration exists for static deployment without adding framework dependencies",
+    "Vercel configuration does not commit project IDs, tokens, or .vercel/project.json",
+    "Security headers are configured for static routes",
+    "Non-hashed static assets use revalidation-safe cache headers",
+    "Vercel ignore rules exclude harness runtime noise from deployments",
+    "Generator verification still passes"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "node scripts/verify-generators.js"],
+  "max_attempts": 1,
+  "depends_on": [],
+  "notes": "Do not add accounts, auth, databases, serverless functions, or npm dependencies."
+}

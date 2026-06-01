@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies when package.json exists
+        shell: bash
+        run: |
+          if [ ! -f package.json ]; then
+            echo "No package.json; skipping dependency install."
+            exit 0
+          fi
+
+          if [ -f pnpm-lock.yaml ]; then
+            corepack enable
+            pnpm install --frozen-lockfile
+          elif [ -f yarn.lock ]; then
+            corepack enable
+            yarn install --immutable || yarn install --frozen-lockfile
+          elif [ -f bun.lockb ] || [ -f bun.lock ]; then
+            npm install -g bun
+            bun install --frozen-lockfile
+          elif [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Run available package checks
+        shell: bash
+        run: |
+          if [ ! -f package.json ]; then
+            echo "No package.json; skipping package checks."
+            exit 0
+          fi
+
+          if [ -f pnpm-lock.yaml ]; then
+            PM="pnpm"
+          elif [ -f yarn.lock ]; then
+            PM="yarn"
+          elif [ -f bun.lockb ] || [ -f bun.lock ]; then
+            PM="bun"
+          else
+            PM="npm"
+          fi
+
+          for SCRIPT in lint typecheck test build; do
+            if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts['$SCRIPT'] ? 0 : 1)"; then
+              echo "Running $SCRIPT"
+              $PM run "$SCRIPT"
+            else
+              echo "Skipping missing script: $SCRIPT"
+            fi
+          done
+
+      - name: Validate agent harness
+        shell: bash
+        run: |
+          if [ -f scripts/agent-validate.mjs ]; then
+            node scripts/agent-validate.mjs --strict
+          else
+            echo "No agent validator found."
+          fi
+
+          if [ -f scripts/agent-doctor.mjs ]; then
+            node scripts/agent-doctor.mjs --strict --json
+          fi
+
+          if [ -f scripts/agent-selftest.mjs ]; then
+            node scripts/agent-selftest.mjs
+          fi
+
+          if [ -f scripts/agent-summary.mjs ]; then
+            node scripts/agent-summary.mjs --strict --json
+          fi

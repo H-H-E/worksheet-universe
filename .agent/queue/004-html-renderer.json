@@ -1,0 +1,22 @@
+{
+  "id": "004-html-renderer",
+  "title": "Render worksheet JSON to HTML",
+  "branch": "agent/004-html-renderer",
+  "priority": 4,
+  "status": "pending",
+  "lane": "rendering",
+  "allowed_paths": ["src/renderers", "src/export", "tests/renderers", "tests/fixtures"],
+  "forbidden_paths": [".git", "node_modules", ".env"],
+  "goal": "Render canonical worksheet JSON into student and teacher HTML without external dependencies in exported files.",
+  "context": "HTML is the default export and should be generated from validated worksheet JSON.",
+  "acceptance": [
+    "Student HTML snapshot test exists",
+    "Teacher answer key HTML snapshot test exists",
+    "Renderer supports section headers, numbered questions, answer boxes, tables, and multiple-choice bubbles",
+    "Exported HTML is semantic and contains no external runtime dependencies"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "npm run test", "npm run build"],
+  "max_attempts": 2,
+  "depends_on": ["002-schema-and-fixtures", "003-test-harness"],
+  "notes": "Keep print behavior in CSS, not a separate content path."
+}

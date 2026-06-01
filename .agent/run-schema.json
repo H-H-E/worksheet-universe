@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Worksheet Universe Agent Run Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "task_id",
+    "status",
+    "started_at",
+    "updated_at",
+    "task_contract_hash",
+    "task_contract_file",
+    "cwd",
+    "worktree",
+    "environment",
+    "commands",
+    "command_gate_preflight",
+    "attempts_used",
+    "codex_timeout_minutes",
+    "command_timeout_minutes"
+  ],
+  "properties": {
+    "run_id": { "type": "string", "minLength": 1 },
+    "task_id": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["running", "passed", "failed", "partial", "blocked"]
+    },
+    "started_at": { "type": "string" },
+    "updated_at": { "type": "string" },
+    "finished_at": { "type": "string" },
+    "duration_ms": { "type": "number", "minimum": 0 },
+    "summary": { "type": "string" },
+    "task_contract_hash": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "task_contract_file": { "type": "string", "minLength": 1 },
+    "worker_prompt_hash": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "cwd": { "type": "string", "minLength": 1 },
+    "worktree": { "type": ["string", "null"] },
+    "environment": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "commands": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "command_gate_preflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command_gates", "command_gate_warnings"],
+      "properties": {
+        "command_gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["command"],
+            "properties": {
+              "command": { "type": "string", "minLength": 1 },
+              "executable": { "type": "string" },
+              "executable_available": { "type": "boolean" },
+              "command_parse_error": { "type": ["string", "null"] },
+              "argv": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "referenced_file": { "type": ["string", "null"] },
+              "referenced_file_available": { "type": ["boolean", "null"] },
+              "package_json_present": { "type": "boolean" },
+              "package_json_error": { "type": ["string", "null"] },
+              "package_script": { "type": ["string", "null"] },
+              "package_script_available": { "type": ["boolean", "null"] }
+            }
+          }
+        },
+        "command_gate_warnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "attempts_used": { "type": "integer", "minimum": 0 },
+    "codex_timeout_minutes": { "type": "number", "minimum": 0 },
+    "command_timeout_minutes": { "type": "number", "minimum": 0 },
+    "baseline_changed_files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "files_changed": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "commands_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "status", "notes"],
+        "properties": {
+          "command": { "type": "string" },
+          "status": { "type": "string", "enum": ["passed", "failed", "skipped"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "codex_runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["suffix", "status", "exit_code", "timed_out", "duration_ms", "prompt_hash", "prompt_file"],
+        "properties": {
+          "suffix": { "type": "string", "minLength": 1 },
+          "status": { "type": "string", "enum": ["passed", "failed"] },
+          "exit_code": { "type": "integer" },
+          "timed_out": { "type": "boolean" },
+          "duration_ms": { "type": "number", "minimum": 0 },
+          "prompt_hash": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+          "prompt_file": { "type": "string", "minLength": 1 },
+          "result_copy": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}
