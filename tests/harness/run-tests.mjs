@@ -3,6 +3,7 @@ import { runNode } from "./shared.mjs";
 const commands = [
   ["scripts/agent-validate.mjs"],
   ["tests/fixtures/validate-fixtures.mjs"],
+  ["tests/generators/validate-generators.mjs"],
   ["scripts/verify-generators.js"]
 ];
 

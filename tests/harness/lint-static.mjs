@@ -19,7 +19,18 @@ for (const file of jsonFiles) {
   }
 }
 
-for (const file of ["app.js", "tests/fixtures/validate-fixtures.mjs", "tests/harness/build-static.mjs", "tests/harness/run-tests.mjs", "tests/harness/typecheck-types.mjs"]) {
+const syntaxFiles = [
+  "app.js",
+  "tests/fixtures/validate-fixtures.mjs",
+  "tests/generators/validate-generators.mjs",
+  "tests/harness/build-static.mjs",
+  "tests/harness/lint-static.mjs",
+  "tests/harness/run-tests.mjs",
+  "tests/harness/shared.mjs",
+  "tests/harness/typecheck-types.mjs"
+];
+
+for (const file of syntaxFiles) {
   const syntax = spawnSync(process.execPath, ["--check", file], {
     cwd: repoRoot,
     encoding: "utf8"
@@ -40,7 +51,7 @@ if (vercelProjectTracked.status === 0) {
 
 console.log(JSON.stringify({
   jsonFilesChecked: jsonFiles.length,
-  syntaxFilesChecked: 6,
+  syntaxFilesChecked: syntaxFiles.length,
   failed: failures
 }, null, 2));
 

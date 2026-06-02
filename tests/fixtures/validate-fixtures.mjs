@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -9,50 +9,57 @@ const validDir = path.join(__dirname, "valid");
 const invalidDir = path.join(__dirname, "invalid");
 
 const schema = readJson(schemaPath);
-const validFiles = listJsonFiles(validDir);
-const invalidFiles = listJsonFiles(invalidDir);
-const failures = [];
 
-if (validFiles.length < 3) {
-  failures.push(`Expected at least 3 valid fixtures, found ${validFiles.length}.`);
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  runCli();
 }
 
-if (invalidFiles.length < 1) {
-  failures.push(`Expected at least 1 invalid fixture, found ${invalidFiles.length}.`);
-}
-
-for (const file of validFiles) {
-  const value = readJson(file);
-  const errors = validateWorksheet(value);
-  if (errors.length) {
-    failures.push(`${relative(file)} should validate but failed:\n${errors.map((error) => `  - ${error}`).join("\n")}`);
-  }
-}
-
-for (const file of invalidFiles) {
-  const value = readJson(file);
-  const errors = validateWorksheet(value);
-  if (!errors.length) {
-    failures.push(`${relative(file)} should fail validation but passed.`);
-  }
-}
-
-const result = {
-  validFixtures: validFiles.length,
-  invalidFixtures: invalidFiles.length,
-  failed: failures
-};
-
-console.log(JSON.stringify(result, null, 2));
-
-if (failures.length) {
-  process.exit(1);
-}
-
-function validateWorksheet(value) {
+export function validateWorksheet(value) {
   const schemaErrors = validateSchema(schema, value, "$", schema);
   const semanticErrors = schemaErrors.length ? [] : validateWorksheetSemantics(value);
   return [...schemaErrors, ...semanticErrors];
+}
+
+function runCli() {
+  const validFiles = listJsonFiles(validDir);
+  const invalidFiles = listJsonFiles(invalidDir);
+  const failures = [];
+
+  if (validFiles.length < 3) {
+    failures.push(`Expected at least 3 valid fixtures, found ${validFiles.length}.`);
+  }
+
+  if (invalidFiles.length < 1) {
+    failures.push(`Expected at least 1 invalid fixture, found ${invalidFiles.length}.`);
+  }
+
+  for (const file of validFiles) {
+    const value = readJson(file);
+    const errors = validateWorksheet(value);
+    if (errors.length) {
+      failures.push(`${relative(file)} should validate but failed:\n${errors.map((error) => `  - ${error}`).join("\n")}`);
+    }
+  }
+
+  for (const file of invalidFiles) {
+    const value = readJson(file);
+    const errors = validateWorksheet(value);
+    if (!errors.length) {
+      failures.push(`${relative(file)} should fail validation but passed.`);
+    }
+  }
+
+  const result = {
+    validFixtures: validFiles.length,
+    invalidFixtures: invalidFiles.length,
+    failed: failures
+  };
+
+  console.log(JSON.stringify(result, null, 2));
+
+  if (failures.length) {
+    process.exit(1);
+  }
 }
 
 function validateWorksheetSemantics(worksheet) {
