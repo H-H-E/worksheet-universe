@@ -1,0 +1,12 @@
+{
+  "name": "worksheet-universe",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static teacher worksheet library and JSON-first worksheet compiler prototype.",
+  "scripts": {
+    "lint": "node tests/harness/lint-static.mjs",
+    "typecheck": "node tests/harness/typecheck-types.mjs",
+    "test": "node tests/harness/run-tests.mjs",
+    "build": "node tests/harness/build-static.mjs"
+  }
+}

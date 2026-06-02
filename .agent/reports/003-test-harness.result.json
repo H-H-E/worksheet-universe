@@ -1,0 +1,71 @@
+{
+  "task_id": "003-test-harness",
+  "status": "passed",
+  "summary": "Added dependency-free npm lint, typecheck, test, and build scripts plus local harness scripts and testing documentation for the static worksheet app.",
+  "files_changed": [
+    ".agent/reports/003-test-harness.md",
+    ".agent/reports/003-test-harness.result.json",
+    "package.json",
+    "tests/harness/build-static.mjs",
+    "tests/harness/lint-static.mjs",
+    "tests/harness/run-tests.mjs",
+    "tests/harness/shared.mjs",
+    "tests/harness/typecheck-types.mjs",
+    "docs/testing.md"
+  ],
+  "commands_run": [
+    {
+      "command": "node scripts/agent-validate.mjs",
+      "status": "passed",
+      "notes": "Harness validation passed with warnings for ready task path overlaps and prior manual result-state mismatches."
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "notes": "Parsed repo JSON, checked JavaScript syntax, and confirmed .vercel/project.json is not tracked."
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "passed",
+      "notes": "Compared worksheet question type enums between schema and TypeScript definitions."
+    },
+    {
+      "command": "npm run test",
+      "status": "passed",
+      "notes": "Ran agent validation, fixture validation, and generator verification."
+    },
+    {
+      "command": "npm run build",
+      "status": "passed",
+      "notes": "Checked static deploy files, Vercel config, app syntax, and fixture validation."
+    }
+  ],
+  "acceptance_results": [
+    {
+      "criterion": "One command validates worksheet fixtures",
+      "status": "passed",
+      "notes": "npm run test runs tests/fixtures/validate-fixtures.mjs."
+    },
+    {
+      "criterion": "CI can run available checks without calling missing scripts",
+      "status": "passed",
+      "notes": "npm run lint, npm run typecheck, npm run test, and npm run build all pass."
+    },
+    {
+      "criterion": "package.json scripts exist if package.json is introduced",
+      "status": "passed",
+      "notes": "package.json defines lint, typecheck, test, and build."
+    },
+    {
+      "criterion": "Test setup is documented in docs/testing.md",
+      "status": "passed",
+      "notes": "docs/testing.md explains all npm harness commands and the static deploy note."
+    }
+  ],
+  "remaining_work": [],
+  "risks": [
+    ".agent/reports was touched because the workflow requires reports, even though task 003 omitted it from allowed_paths.",
+    "The build command is a static validation gate, not a bundler or output-directory producer."
+  ],
+  "next_recommended_task": null
+}
