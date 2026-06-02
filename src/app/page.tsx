@@ -1,5 +1,11 @@
-import { TeacherConsole } from "@/features/worksheet/TeacherConsole";
+import { Suspense } from "react";
+
+import { WorksheetCommandCenter } from "@/features/worksheet/command-center";
 
 export default function Home() {
-  return <TeacherConsole />;
+  return (
+    <Suspense fallback={<main className="command-loading">Loading…</main>}>
+      <WorksheetCommandCenter />
+    </Suspense>
+  );
 }

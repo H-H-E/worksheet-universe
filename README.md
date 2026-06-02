@@ -1,8 +1,8 @@
 # Worksheet Universe
 
-Worksheet Universe is a JSON-first teacher worksheet console for generated K-12 math practice.
+Worksheet Universe is a JSON-first teacher command center for generated K-12 math practice.
 
-The app now runs as a Next.js App Router frontend with TypeScript, Tailwind CSS, and source-owned shadcn/ui components. Teachers can search worksheet generators, filter by exact grade/strand/format, generate deterministic worksheet JSON, preview printable student pages, check answers, audit answer keys, and copy canonical worksheet JSON.
+The app runs as a Vercel-ready Next.js App Router frontend with TypeScript, Tailwind CSS, and source-owned shadcn/ui components. Teachers can start from a natural-language intent, apply structured grade/topic/format settings, generate deterministic worksheet JSON, preview printable student pages, check answers, audit answer keys, print student/key copies, make another version, and copy canonical worksheet JSON.
 
 ## Run locally
 
@@ -44,10 +44,11 @@ Do not commit `.vercel/project.json`, Vercel tokens, environment files, `node_mo
 
 - `src/app` - Next App Router entry, global theme, and page shell
 - `src/components/ui` - source-owned shadcn/ui primitives
-- `src/features/worksheet` - worksheet catalog, deterministic generation, filtering, audit, checking, and teacher console UI
+- `src/features/worksheet` - worksheet catalog, deterministic generation, filtering, audit, checking, and command-center UI
+- `src/features/worksheet/command-center` - local prompt parser, URL state helpers, setup panel, worksheet preview, trust panel, and export actions
 - `src/schema` and `src/types` - canonical worksheet JSON contract
 - `scripts/verify-generators.ts` - all-generator canonical JSON verification
-- `tests/frontend` - workflow tests for filtering, generation, format switching, and answer checking
+- `tests/frontend` - workflow tests for filtering, prompt parsing, URL state, generation, format switching, and answer checking
 
 ## Product rules
 

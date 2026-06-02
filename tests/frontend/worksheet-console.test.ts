@@ -5,8 +5,13 @@ import {
   answerForQuestion,
   auditWorksheet,
   checkAnswer,
+  defaultCommandCenterIntent,
   filterWorksheetTypes,
   generateWorksheet,
+  intentFromSearchParams,
+  intentToSearchParams,
+  nextSeed,
+  parseWorksheetPrompt,
   worksheetTypes
 } from "../../src/features/worksheet/index";
 
@@ -22,6 +27,73 @@ test("combined filters narrow worksheet types by query, grade, strand, and forma
   assert.ok(result.every((type) => type.grades.includes("4")));
   assert.ok(result.every((type) => type.strand === "Fractions, Decimals, and Percents"));
   assert.ok(result.every((type) => type.formats.includes("worked-practice")));
+});
+
+test("prompt parser maps teacher language to deterministic worksheet controls", () => {
+  const parsed = parseWorksheetPrompt(
+    "Make a Grade 5 fractions worksheet with visual models, 12 questions, easy difficulty, with answers.",
+    worksheetTypes
+  );
+
+  assert.equal(parsed.exactGrade, "5");
+  assert.equal(parsed.strand, "Fractions, Decimals, and Percents");
+  assert.equal(parsed.format, "visual-model");
+  assert.equal(parsed.itemCount, 12);
+  assert.equal(parsed.difficulty, "readiness");
+
+  const filtered = filterWorksheetTypes(worksheetTypes, {
+    exactGrade: parsed.exactGrade,
+    strand: parsed.strand,
+    format: parsed.format
+  });
+  assert.ok(filtered.length > 0);
+});
+
+test("prompt parser clamps oversized counts and can identify exact worksheet titles", () => {
+  const parsed = parseWorksheetPrompt(
+    "Grade 2 addition facts fluency exit ticket with 20 problems hard",
+    worksheetTypes
+  );
+
+  assert.equal(parsed.exactGrade, "2");
+  assert.equal(parsed.worksheetTypeId, "addition-facts-fluency");
+  assert.equal(parsed.format, "quick-check");
+  assert.equal(parsed.itemCount, 12);
+  assert.equal(parsed.difficulty, "challenge");
+});
+
+test("command center URL state round-trips changed controls", () => {
+  const intent = {
+    ...defaultCommandCenterIntent(worksheetTypes),
+    activePanel: "export" as const,
+    itemCount: 10,
+    seed: 104,
+    pageSize: "a4" as const
+  };
+
+  const params = intentToSearchParams(intent, defaultCommandCenterIntent(worksheetTypes));
+  const restored = intentFromSearchParams(params, worksheetTypes);
+
+  assert.equal(params.get("panel"), "export");
+  assert.equal(restored.activePanel, "export");
+  assert.equal(restored.itemCount, 10);
+  assert.equal(restored.seed, 104);
+  assert.equal(restored.pageSize, "a4");
+});
+
+test("make another like this advances the deterministic seed", () => {
+  const intent = defaultCommandCenterIntent(worksheetTypes);
+  const first = generateWorksheet(
+    worksheetTypes.find((type) => type.id === intent.typeId) || worksheetTypes[0],
+    { itemCount: intent.itemCount, seed: intent.seed, format: intent.format }
+  );
+  const second = generateWorksheet(
+    worksheetTypes.find((type) => type.id === intent.typeId) || worksheetTypes[0],
+    { itemCount: intent.itemCount, seed: nextSeed(intent.seed), format: intent.format }
+  );
+
+  assert.equal(nextSeed(42), 43);
+  assert.notEqual(first.id, second.id);
 });
 
 test("empty filter state returns no worksheet types", () => {

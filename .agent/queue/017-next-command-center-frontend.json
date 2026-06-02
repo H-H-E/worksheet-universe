@@ -1,0 +1,51 @@
+{
+  "id": "017-next-command-center-frontend",
+  "title": "Fresh Next.js command center frontend",
+  "branch": "agent/017-next-command-center-frontend",
+  "priority": 17,
+  "status": "pending",
+  "lane": "frontend",
+  "allowed_paths": [
+    ".agent/queue",
+    ".agent/reports",
+    "README.md",
+    "components.json",
+    "docs",
+    "eslint.config.mjs",
+    "next-env.d.ts",
+    "next.config.ts",
+    "package-lock.json",
+    "package.json",
+    "postcss.config.mjs",
+    "scripts",
+    "src",
+    "tests",
+    "tsconfig.json",
+    "vercel.json"
+  ],
+  "forbidden_paths": [".git", "node_modules", ".env", ".vercel/project.json"],
+  "goal": "Rebuild the root frontend as a fresh Vercel/Next.js command center while preserving the worksheet JSON compiler, deterministic generation, answer checking, and static export path.",
+  "context": "The user requested a fresh Next.js command-center frontend following the Vercel Web Interface Guidelines. The command center should support prompt/skill entry, structured settings, PDF-style worksheet preview, answer/trust panel, export actions, URL-backed state, and a local deterministic prompt parser. Worksheet JSON remains the source of truth.",
+  "acceptance": [
+    "The root app is a fresh Next.js App Router command-center experience with prompt entry, structured setup, worksheet preview, trust panel, export actions, and mobile workflow",
+    "The current console UI implementation is removed or replaced without changing the public Worksheet JSON schema",
+    "A local parseWorksheetPrompt helper maps grade, topic/type, item count, format, and difficulty hints to existing deterministic worksheet generators without fabricating content",
+    "Stateful UI choices are reflected in URL query parameters and restored on load",
+    "Preview, answer key, answer checking, print, JSON copy, and make-another behavior compile from canonical Worksheet JSON",
+    "Changed UI follows the latest Vercel Web Interface Guidelines for labels, focus, semantic actions/navigation, live feedback, content handling, motion, and print/mobile layout",
+    "Frontend tests cover prompt parsing, filter mapping, deterministic generation, format switching, answer audit/checking, URL state helpers, and make-another seed behavior",
+    "Required validation, lint, typecheck, test, generator verification, and build commands pass"
+  ],
+  "commands": [
+    "node scripts/agent-validate.mjs",
+    "node tests/fixtures/validate-fixtures.mjs",
+    "npm run lint",
+    "npm run typecheck",
+    "npm run test",
+    "npm run test:generators",
+    "npm run build"
+  ],
+  "max_attempts": 2,
+  "depends_on": ["002-schema-and-fixtures", "003-test-harness", "016-next-shadcn-frontend-redesign"],
+  "notes": "Do not add accounts, auth, databases, LMS integrations, OCR, complex PDF generation, or paid/API-backed AI generation. Keep worksheet output editable and JSON-first."
+}

@@ -1,0 +1,104 @@
+{
+  "task_id": "017-next-command-center-frontend",
+  "status": "passed",
+  "summary": "Rebuilt the root frontend as a fresh Next.js App Router command center with local prompt parsing, structured setup, URL-backed state, worksheet preview, trust/export panels, mobile workflow, and preserved JSON-first worksheet generation.",
+  "files_changed": [
+    ".agent/queue/017-next-command-center-frontend.json",
+    ".agent/reports/017-next-command-center-frontend.md",
+    ".agent/reports/017-next-command-center-frontend.result.json",
+    "README.md",
+    "src/app/globals.css",
+    "src/app/page.tsx",
+    "src/components/ui/sheet.tsx",
+    "src/components/ui/tabs.tsx",
+    "src/features/worksheet/TeacherConsole.tsx",
+    "src/features/worksheet/index.ts",
+    "src/features/worksheet/command-center",
+    "tests/frontend/worksheet-console.test.ts"
+  ],
+  "commands_run": [
+    {
+      "command": "node scripts/agent-validate.mjs",
+      "status": "passed",
+      "notes": "Passed with existing warnings for older manual result-state mismatches and ready-task path overlaps."
+    },
+    {
+      "command": "node tests/fixtures/validate-fixtures.mjs",
+      "status": "passed",
+      "notes": "Validated 3 valid fixtures and 1 invalid fixture."
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "notes": "ESLint passed with zero warnings."
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "passed",
+      "notes": "TypeScript no-emit check passed."
+    },
+    {
+      "command": "npm run test",
+      "status": "passed",
+      "notes": "Frontend tests passed, including prompt parsing, URL state, filtering, generation, format switching, audit, answer checking, and make-another seed behavior."
+    },
+    {
+      "command": "npm run test:generators",
+      "status": "passed",
+      "notes": "Checked 139 worksheet types and 834 generated items."
+    },
+    {
+      "command": "npm run build",
+      "status": "passed",
+      "notes": "Next webpack build passed; route / prerendered as static content."
+    }
+  ],
+  "acceptance_results": [
+    {
+      "criterion": "The root app is a fresh Next.js App Router command-center experience with prompt entry, structured setup, worksheet preview, trust panel, export actions, and mobile workflow",
+      "status": "passed",
+      "notes": "src/app/page.tsx now renders WorksheetCommandCenter with prompt entry, setup panel, preview, trust/export panel tabs, and mobile step tabs."
+    },
+    {
+      "criterion": "The current console UI implementation is removed or replaced without changing the public Worksheet JSON schema",
+      "status": "passed",
+      "notes": "src/features/worksheet/TeacherConsole.tsx was deleted; src/types/worksheet.d.ts and schema files were not changed."
+    },
+    {
+      "criterion": "A local parseWorksheetPrompt helper maps grade, topic/type, item count, format, and difficulty hints to existing deterministic worksheet generators without fabricating content",
+      "status": "passed",
+      "notes": "parseWorksheetPrompt maps prompt hints to existing worksheetTypes, strands, formats, grades, counts, and difficulty targets; tests cover fraction visual-model prompts and exact title detection."
+    },
+    {
+      "criterion": "Stateful UI choices are reflected in URL query parameters and restored on load",
+      "status": "passed",
+      "notes": "intentFromSearchParams, intentToSearchParams, and normalizeIntent handle prompt, grade, strand, type, format, count, seed, difficulty, page size, and active panel; tests cover round-trip restoration."
+    },
+    {
+      "criterion": "Preview, answer key, answer checking, print, JSON copy, and make-another behavior compile from canonical Worksheet JSON",
+      "status": "passed",
+      "notes": "WorksheetPreview, TrustPanel, checkAll, copyJson, print modes, and nextSeed behavior all consume generated Worksheet JSON and answerKey data."
+    },
+    {
+      "criterion": "Changed UI follows the latest Vercel Web Interface Guidelines for labels, focus, semantic actions/navigation, live feedback, content handling, motion, and print/mobile layout",
+      "status": "passed",
+      "notes": "Fetched the latest guidelines, then audited changed UI/CSS for labels, aria-live feedback, focus-visible styles, labelled icon buttons, URL-backed state, reduced motion, touch behavior, print modes, and mobile safe-area layout."
+    },
+    {
+      "criterion": "Frontend tests cover prompt parsing, filter mapping, deterministic generation, format switching, answer audit/checking, URL state helpers, and make-another seed behavior",
+      "status": "passed",
+      "notes": "tests/frontend/worksheet-console.test.ts now covers all listed helper and generation scenarios."
+    },
+    {
+      "criterion": "Required validation, lint, typecheck, test, generator verification, and build commands pass",
+      "status": "passed",
+      "notes": "All required commands passed locally."
+    }
+  ],
+  "remaining_work": [],
+  "risks": [
+    "No local Chromium/Playwright binary was available for screenshot automation.",
+    "The dev server required escalation and webpack mode because the sandbox blocked port binding and Turbopack hit the host file-watch limit."
+  ],
+  "next_recommended_task": null
+}
