@@ -1,0 +1,67 @@
+{
+  "task_id": "002-schema-and-fixtures",
+  "status": "passed",
+  "summary": "Added canonical worksheet JSON schema, documented TypeScript definitions, three valid fixtures, one invalid fixture, and a dependency-free fixture validator with semantic answer-link checks.",
+  "files_changed": [
+    ".agent/reports/002-schema-and-fixtures.md",
+    ".agent/reports/002-schema-and-fixtures.result.json",
+    "src/schema/README.md",
+    "src/schema/worksheet.schema.json",
+    "src/types/worksheet.d.ts",
+    "tests/fixtures/validate-fixtures.mjs",
+    "tests/fixtures/valid/addition-fluency.json",
+    "tests/fixtures/valid/fraction-model.json",
+    "tests/fixtures/valid/linear-equation.json",
+    "tests/fixtures/invalid/malformed-question.json"
+  ],
+  "commands_run": [
+    {
+      "command": "node scripts/agent-validate.mjs",
+      "status": "passed",
+      "notes": "Harness validation passed with warnings for ready task path overlaps and prior manual result-state mismatches."
+    },
+    {
+      "command": "node tests/fixtures/validate-fixtures.mjs",
+      "status": "passed",
+      "notes": "Validated 3 valid fixtures and confirmed 1 malformed fixture fails validation."
+    }
+  ],
+  "acceptance_results": [
+    {
+      "criterion": "At least 3 fixture worksheets validate successfully",
+      "status": "passed",
+      "notes": "addition-fluency.json, fraction-model.json, and linear-equation.json validate successfully."
+    },
+    {
+      "criterion": "At least 1 malformed fixture test fails validation",
+      "status": "passed",
+      "notes": "malformed-question.json is rejected by the fixture validator."
+    },
+    {
+      "criterion": "Schema includes worksheet, section, question, answer key, and metadata",
+      "status": "passed",
+      "notes": "worksheet.schema.json defines root worksheet properties, section, question, answerKeyItem, and metadata definitions."
+    },
+    {
+      "criterion": "Worksheet schema includes id, title, subject, gradeBand, topic, learningGoals, instructions, sections, answerKey, and metadata",
+      "status": "passed",
+      "notes": "All required worksheet root fields are listed in worksheet.schema.json."
+    },
+    {
+      "criterion": "Question schema includes the required worksheet compiler question type enum",
+      "status": "passed",
+      "notes": "Question type enum includes numeric, integer, decimal, money, percent, fraction, coordinate, equation, multipleChoice, shortText, table, graph, and visualModel."
+    },
+    {
+      "criterion": "Schema documents versioning and migration expectations",
+      "status": "passed",
+      "notes": "src/schema/README.md documents schemaVersion, contentVersion, and migration expectations."
+    }
+  ],
+  "remaining_work": [],
+  "risks": [
+    "The current app generator output has not yet been adapted into this canonical schema.",
+    ".agent/reports was touched because the workflow requires reports, even though task 002 omitted it from allowed_paths."
+  ],
+  "next_recommended_task": null
+}

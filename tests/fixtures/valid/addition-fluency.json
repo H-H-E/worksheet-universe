@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "addition-fluency-grade-2-seed-42",
+  "title": "Addition Facts Fluency",
+  "subject": "math",
+  "gradeBand": "2",
+  "topic": "Operations and Fluency",
+  "learningGoals": [
+    "Add within 20 using known facts.",
+    "Check answers with inverse reasoning."
+  ],
+  "instructions": "Solve each addition fact. Write one answer in each box.",
+  "sections": [
+    {
+      "id": "practice",
+      "title": "Practice",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "integer",
+          "prompt": "8 + 7 =",
+          "content": [
+            { "kind": "text", "text": "8 + 7 =" },
+            { "kind": "answerBox", "answerRef": "q1", "label": "answer" }
+          ],
+          "answerRef": "q1",
+          "metadata": {
+            "difficulty": { "band": "fluency", "level": 2 },
+            "skills": ["addition-within-20"],
+            "generator": { "id": "addition-facts", "version": "1.0.0", "seed": "42", "variant": "within-20" }
+          }
+        },
+        {
+          "id": "q2",
+          "type": "integer",
+          "prompt": "9 + 6 =",
+          "content": [
+            { "kind": "text", "text": "9 + 6 =" },
+            { "kind": "answerBox", "answerRef": "q2", "label": "answer" }
+          ],
+          "answerRef": "q2",
+          "metadata": {
+            "difficulty": { "band": "fluency", "level": 2 },
+            "skills": ["addition-within-20"],
+            "generator": { "id": "addition-facts", "version": "1.0.0", "seed": "42", "variant": "within-20" }
+          }
+        }
+      ]
+    }
+  ],
+  "answerKey": [
+    {
+      "id": "a1",
+      "questionId": "q1",
+      "answer": { "kind": "integer", "value": "15" },
+      "normalization": "integer",
+      "workedSolution": [
+        { "text": "Make ten: 8 + 2 = 10." },
+        { "text": "Add the remaining 5 to get 15." }
+      ]
+    },
+    {
+      "id": "a2",
+      "questionId": "q2",
+      "answer": { "kind": "integer", "value": "15" },
+      "normalization": "integer",
+      "workedSolution": [
+        { "text": "Make ten: 9 + 1 = 10." },
+        { "text": "Add the remaining 5 to get 15." }
+      ]
+    }
+  ],
+  "metadata": {
+    "createdAt": "2026-06-02T19:00:00Z",
+    "generator": { "id": "addition-facts", "version": "1.0.0", "seed": "42", "variant": "within-20" },
+    "format": "fluency-grid",
+    "standards": [
+      { "framework": "CCSS-M", "code": "2.OA.B.2", "alignment": "primary" }
+    ],
+    "versioning": {
+      "schemaVersion": "1.0.0",
+      "contentVersion": "1.0.0",
+      "migration": { "strategy": "none", "notes": [] }
+    }
+  }
+}

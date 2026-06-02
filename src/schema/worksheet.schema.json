@@ -1,0 +1,435 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worksheet-universe.local/schema/worksheet.schema.json",
+  "title": "Worksheet Universe Worksheet",
+  "description": "Canonical worksheet JSON. This is the source of truth for generation, editing, rendering, answer keys, and exports.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "title",
+    "subject",
+    "gradeBand",
+    "topic",
+    "learningGoals",
+    "instructions",
+    "sections",
+    "answerKey",
+    "metadata"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$",
+      "description": "Schema version used to validate this worksheet. Breaking changes require a new major version and a migration note."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "enum": ["math"]
+    },
+    "gradeBand": {
+      "type": "string",
+      "minLength": 1
+    },
+    "topic": {
+      "type": "string",
+      "minLength": 1
+    },
+    "learningGoals": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "instructions": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/section" }
+    },
+    "answerKey": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/answerKeyItem" }
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "$defs": {
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "questions"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instructions": {
+          "type": "string"
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/question" }
+        }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "prompt", "content", "answerRef"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "type": {
+          "type": "string",
+          "description": "Worksheet compiler question type enum. Renderers and answer checkers switch on this value.",
+          "enum": [
+            "numeric",
+            "integer",
+            "decimal",
+            "money",
+            "percent",
+            "fraction",
+            "coordinate",
+            "equation",
+            "multipleChoice",
+            "shortText",
+            "table",
+            "graph",
+            "visualModel"
+          ]
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/contentBlock" }
+        },
+        "answerRef": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "difficulty": { "$ref": "#/$defs/difficulty" },
+            "skills": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "generator": { "$ref": "#/$defs/generatorLineage" }
+          }
+        }
+      }
+    },
+    "contentBlock": {
+      "oneOf": [
+        { "$ref": "#/$defs/textBlock" },
+        { "$ref": "#/$defs/mathBlock" },
+        { "$ref": "#/$defs/visualBlock" },
+        { "$ref": "#/$defs/tableBlock" },
+        { "$ref": "#/$defs/answerBoxBlock" },
+        { "$ref": "#/$defs/choicesBlock" },
+        { "$ref": "#/$defs/workspaceBlock" }
+      ]
+    },
+    "textBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "text"],
+      "properties": {
+        "kind": { "const": "text" },
+        "text": { "type": "string" }
+      }
+    },
+    "mathBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "tex", "alt"],
+      "properties": {
+        "kind": { "const": "math" },
+        "tex": { "type": "string", "minLength": 1 },
+        "alt": { "type": "string", "minLength": 1 }
+      }
+    },
+    "visualBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "visualType", "data", "alt"],
+      "properties": {
+        "kind": { "const": "visual" },
+        "visualType": {
+          "type": "string",
+          "enum": ["dots", "fractionBar", "numberLine", "coordinatePlane", "geometryFigure", "graphPlaceholder"]
+        },
+        "data": { "type": "object" },
+        "alt": { "type": "string", "minLength": 1 }
+      }
+    },
+    "tableBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "headers", "rows"],
+      "properties": {
+        "kind": { "const": "table" },
+        "caption": { "type": "string" },
+        "headers": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "answerBoxBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "answerRef"],
+      "properties": {
+        "kind": { "const": "answerBox" },
+        "answerRef": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "label": { "type": "string" },
+        "width": { "type": "string" }
+      }
+    },
+    "choicesBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "choices"],
+      "properties": {
+        "kind": { "const": "choices" },
+        "choices": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "content"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]*$"
+              },
+              "label": { "type": "string", "minLength": 1 },
+              "content": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "workspaceBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "style"],
+      "properties": {
+        "kind": { "const": "workspace" },
+        "style": {
+          "type": "string",
+          "enum": ["blank", "ruled", "grid", "largePrint"]
+        },
+        "height": { "type": "string" }
+      }
+    },
+    "answerKeyItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "questionId", "answer", "normalization", "workedSolution"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "questionId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "answer": { "$ref": "#/$defs/answer" },
+        "normalization": {
+          "type": "string",
+          "enum": ["number", "integer", "decimal", "money", "percent", "fraction", "coordinate", "equation", "text", "choice"]
+        },
+        "alternates": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tolerance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "workedSolution": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/solutionStep" }
+        }
+      }
+    },
+    "answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["number", "integer", "decimal", "money", "percent", "fraction", "coordinate", "equation", "text", "choice"]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical": {
+          "type": "object"
+        }
+      }
+    },
+    "solutionStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string", "minLength": 1 },
+        "math": { "type": "string" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdAt", "generator", "format", "standards", "versioning"],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "generator": { "$ref": "#/$defs/generatorLineage" },
+        "format": {
+          "type": "string",
+          "enum": ["fluency-grid", "worked-practice", "visual-model", "quick-check", "real-world", "graph-data"]
+        },
+        "standards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/standardRef" }
+        },
+        "versioning": { "$ref": "#/$defs/versioning" }
+      }
+    },
+    "generatorLineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "seed"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "seed": {
+          "type": "string",
+          "minLength": 1
+        },
+        "variant": {
+          "type": "string"
+        }
+      }
+    },
+    "standardRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["framework", "code", "alignment"],
+      "properties": {
+        "framework": {
+          "type": "string",
+          "enum": ["CCSS-M", "SAT-MATH", "ACT-MATH", "local"]
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "alignment": {
+          "type": "string",
+          "enum": ["primary", "secondary", "supporting"]
+        }
+      }
+    },
+    "difficulty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["band", "level"],
+      "properties": {
+        "band": {
+          "type": "string",
+          "enum": ["readiness", "intro", "core", "fluency", "application", "extension"]
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "versioning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "contentVersion", "migration"],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "pattern": "^1\\.0\\.0$"
+        },
+        "contentVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "migration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["strategy", "notes"],
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": ["none", "forward-only", "manual-review"]
+            },
+            "notes": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fraction-model-grade-3-seed-12",
+  "title": "Fraction Parts of a Whole",
+  "subject": "math",
+  "gradeBand": "3",
+  "topic": "Fractions, Decimals, and Percents",
+  "learningGoals": [
+    "Name a fraction from a shaded area model.",
+    "Use numerator and denominator language."
+  ],
+  "instructions": "Use the model to write each fraction.",
+  "sections": [
+    {
+      "id": "models",
+      "title": "Models",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "fraction",
+          "prompt": "What fraction of the bar is shaded?",
+          "content": [
+            {
+              "kind": "visual",
+              "visualType": "fractionBar",
+              "data": { "numerator": 3, "denominator": 8 },
+              "alt": "A bar split into 8 equal parts with 3 shaded."
+            },
+            { "kind": "answerBox", "answerRef": "q1", "label": "fraction" }
+          ],
+          "answerRef": "q1",
+          "metadata": {
+            "difficulty": { "band": "intro", "level": 1 },
+            "skills": ["unit-fractions", "area-models"],
+            "generator": { "id": "fraction-models", "version": "1.0.0", "seed": "12", "variant": "fraction-bar" }
+          }
+        }
+      ]
+    }
+  ],
+  "answerKey": [
+    {
+      "id": "a1",
+      "questionId": "q1",
+      "answer": {
+        "kind": "fraction",
+        "value": "3/8",
+        "canonical": { "numerator": 3, "denominator": 8 }
+      },
+      "normalization": "fraction",
+      "alternates": ["three eighths"],
+      "workedSolution": [
+        { "text": "Count shaded parts: 3." },
+        { "text": "Count total equal parts: 8." },
+        { "text": "Write shaded over total.", "math": "\\frac{3}{8}" }
+      ]
+    }
+  ],
+  "metadata": {
+    "createdAt": "2026-06-02T19:00:00Z",
+    "generator": { "id": "fraction-models", "version": "1.0.0", "seed": "12", "variant": "fraction-bar" },
+    "format": "visual-model",
+    "standards": [
+      { "framework": "CCSS-M", "code": "3.NF.A.1", "alignment": "primary" }
+    ],
+    "versioning": {
+      "schemaVersion": "1.0.0",
+      "contentVersion": "1.0.0",
+      "migration": { "strategy": "none", "notes": [] }
+    }
+  }
+}

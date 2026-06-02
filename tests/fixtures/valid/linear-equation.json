@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "linear-equation-grade-8-seed-7",
+  "title": "Two-Step Equations",
+  "subject": "math",
+  "gradeBand": "8",
+  "topic": "Algebra and Functions",
+  "learningGoals": [
+    "Solve a two-step linear equation.",
+    "Check a solution by substitution."
+  ],
+  "instructions": "Solve for x. Show work in the workspace.",
+  "sections": [
+    {
+      "id": "equations",
+      "title": "Equations",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "equation",
+          "prompt": "Solve for x: 4x - 3 = 21",
+          "content": [
+            { "kind": "text", "text": "Solve for " },
+            { "kind": "math", "tex": "x", "alt": "x" },
+            { "kind": "text", "text": ": " },
+            { "kind": "math", "tex": "4x - 3 = 21", "alt": "four x minus three equals twenty one" },
+            { "kind": "workspace", "style": "ruled", "height": "1.25in" },
+            { "kind": "answerBox", "answerRef": "q1", "label": "x =" }
+          ],
+          "answerRef": "q1",
+          "metadata": {
+            "difficulty": { "band": "core", "level": 3 },
+            "skills": ["two-step-equations", "inverse-operations"],
+            "generator": { "id": "linear-equations", "version": "1.0.0", "seed": "7", "variant": "integer-solution" }
+          }
+        }
+      ]
+    }
+  ],
+  "answerKey": [
+    {
+      "id": "a1",
+      "questionId": "q1",
+      "answer": { "kind": "integer", "value": "6", "canonical": { "variable": "x", "value": 6 } },
+      "normalization": "integer",
+      "workedSolution": [
+        { "text": "Add 3 to both sides.", "math": "4x = 24" },
+        { "text": "Divide both sides by 4.", "math": "x = 6" },
+        { "text": "Check: 4(6) - 3 = 21." }
+      ]
+    }
+  ],
+  "metadata": {
+    "createdAt": "2026-06-02T19:00:00Z",
+    "generator": { "id": "linear-equations", "version": "1.0.0", "seed": "7", "variant": "integer-solution" },
+    "format": "worked-practice",
+    "standards": [
+      { "framework": "CCSS-M", "code": "8.EE.C.7", "alignment": "primary" }
+    ],
+    "versioning": {
+      "schemaVersion": "1.0.0",
+      "contentVersion": "1.0.0",
+      "migration": { "strategy": "none", "notes": [] }
+    }
+  }
+}

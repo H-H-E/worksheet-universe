@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "malformed-question",
+  "title": "Malformed Fixture",
+  "subject": "math",
+  "gradeBand": "4",
+  "topic": "Validation",
+  "learningGoals": ["Show that malformed fixtures fail validation."],
+  "instructions": "This fixture should not pass.",
+  "sections": [
+    {
+      "id": "bad-section",
+      "title": "Bad Section",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "vibes",
+          "prompt": "This question has an invalid type.",
+          "content": [
+            { "kind": "text", "text": "Invalid compiler type." }
+          ]
+        }
+      ]
+    }
+  ],
+  "answerKey": [
+    {
+      "id": "a1",
+      "questionId": "missing-question",
+      "answer": { "kind": "text", "value": "nope" },
+      "normalization": "text",
+      "workedSolution": [{ "text": "No valid solution." }]
+    }
+  ],
+  "metadata": {
+    "createdAt": "2026-06-02T19:00:00Z",
+    "generator": { "id": "malformed-fixture", "version": "1.0.0", "seed": "bad" },
+    "format": "quick-check",
+    "standards": [],
+    "versioning": {
+      "schemaVersion": "1.0.0",
+      "contentVersion": "1.0.0",
+      "migration": { "strategy": "manual-review", "notes": ["Malformed by design."] }
+    }
+  }
+}
