@@ -97,7 +97,7 @@
     {
       "criterion": "Vercel and README documentation reflect the Next.js deployment path",
       "status": "passed",
-      "notes": "README and docs/testing describe the Next.js deployment and verification path; vercel.json keeps deployment headers."
+      "notes": "README and docs/testing describe the Next.js deployment and verification path; vercel.json keeps deployment headers and sets outputDirectory to out."
     }
   ],
   "risks": [
