@@ -1,5 +1,5 @@
 import { buildCanonicalWorksheet } from "./canonical-worksheet.mjs";
-import { formatFraction, money, simplifyFraction } from "./math-utils.mjs";
+import { formatFraction, simplifyFraction } from "./math-utils.mjs";
 import { createRng } from "./rng.mjs";
 
 const VERSION = "1.0.0";

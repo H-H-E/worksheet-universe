@@ -1,0 +1,109 @@
+{
+  "task_id": "016-next-shadcn-frontend-redesign",
+  "status": "passed",
+  "summary": "Replaced the static frontend with a Next.js App Router, TypeScript, Tailwind, and shadcn/ui teacher console that generates, previews, audits, checks, prints, and copies canonical worksheet JSON.",
+  "files_changed": [
+    ".agent/queue/016-next-shadcn-frontend-redesign.json",
+    ".agent/reports/016-next-shadcn-frontend-redesign.md",
+    ".agent/reports/016-next-shadcn-frontend-redesign.result.json",
+    ".gitignore",
+    "README.md",
+    "components.json",
+    "docs/testing.md",
+    "eslint.config.mjs",
+    "next-env.d.ts",
+    "next.config.ts",
+    "package-lock.json",
+    "package.json",
+    "postcss.config.mjs",
+    "scripts/verify-generators.js",
+    "scripts/verify-generators.ts",
+    "src/app",
+    "src/components/ui",
+    "src/features/worksheet",
+    "src/lib/utils.ts",
+    "tests/frontend/worksheet-console.test.ts",
+    "tsconfig.json",
+    "vercel.json"
+  ],
+  "commands_run": [
+    {
+      "command": "node scripts/agent-validate.mjs",
+      "status": "passed",
+      "notes": "Passed with warnings for older manual result-state mismatches and older ready-task path overlaps."
+    },
+    {
+      "command": "node tests/fixtures/validate-fixtures.mjs",
+      "status": "passed",
+      "notes": "Validated 3 valid fixtures and 1 invalid fixture."
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "notes": "ESLint passed with zero warnings."
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "passed",
+      "notes": "TypeScript no-emit check passed."
+    },
+    {
+      "command": "npm run test",
+      "status": "passed",
+      "notes": "Frontend/core workflow test passed."
+    },
+    {
+      "command": "npm run test:generators",
+      "status": "passed",
+      "notes": "Checked 139 worksheet types and 834 generated items."
+    },
+    {
+      "command": "npm run build",
+      "status": "passed",
+      "notes": "Next webpack build passed; route / prerendered as static content."
+    }
+  ],
+  "acceptance_results": [
+    {
+      "criterion": "Next.js App Router, TypeScript, Tailwind, shadcn configuration, and npm scripts are present",
+      "status": "passed",
+      "notes": "src/app, next.config.ts, tsconfig.json, postcss.config.mjs, components.json, package scripts, static preview script, and shadcn UI source files are present."
+    },
+    {
+      "criterion": "The root experience is a dense light teacher console with search, exact grade, strand, format filters, generator selection, settings, live preview, answer audit, answer checking, and print-safe output",
+      "status": "passed",
+      "notes": "src/features/worksheet/TeacherConsole.tsx renders the routed root console with those controls and print-safe worksheet preview."
+    },
+    {
+      "criterion": "Worksheet generation returns canonical Worksheet JSON and uses it as the source for preview, answer key, checking, and print rendering",
+      "status": "passed",
+      "notes": "generateWorksheet returns Worksheet JSON consumed by preview, answerForQuestion, checkAnswer, auditWorksheet, JSON copy, and print."
+    },
+    {
+      "criterion": "Typed helpers exist for filtering worksheet types, generating worksheets, auditing worksheets, and checking answers",
+      "status": "passed",
+      "notes": "src/features/worksheet exports typed filtering, generation, audit, answer lookup, and answer checking helpers."
+    },
+    {
+      "criterion": "Generator verification covers every worksheet type and passes",
+      "status": "passed",
+      "notes": "npm run test:generators and node scripts/verify-generators.js checked 139 worksheet types and 834 generated items."
+    },
+    {
+      "criterion": "Static index.html, app.js, and styles.css are retired so there is not a second frontend system",
+      "status": "passed",
+      "notes": "Tracked static frontend files are deleted and the routed Next page imports TeacherConsole."
+    },
+    {
+      "criterion": "Vercel and README documentation reflect the Next.js deployment path",
+      "status": "passed",
+      "notes": "README and docs/testing describe the Next.js deployment and verification path; vercel.json keeps deployment headers."
+    }
+  ],
+  "risks": [
+    "Browser automation was not available in this container; static HTTP and exported HTML shell checks passed instead.",
+    "Only one frontend/core workflow test exists so far; future work should add UI interaction and print layout coverage."
+  ],
+  "remaining_work": [],
+  "next_recommended_task": null
+}

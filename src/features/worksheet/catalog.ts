@@ -1,4 +1,68 @@
-const gradeBands = [
+import type { WorksheetFormat } from "@/types/worksheet";
+
+export type ExactGradeId = "0" | "K" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "11" | "12";
+export type GradeBandId = "pk-k" | "1-2" | "3-5" | "6-8" | "9-12";
+export type Strand =
+  | "Number Sense"
+  | "Operations and Fluency"
+  | "Fractions, Decimals, and Percents"
+  | "Ratios and Proportional Reasoning"
+  | "Algebra and Functions"
+  | "Geometry and Spatial Reasoning"
+  | "Measurement"
+  | "Data, Statistics, and Probability"
+  | "Financial and Consumer Math"
+  | "Word Problems and Mathematical Reasoning"
+  | "Math Puzzles, Logic, and Enrichment";
+
+export type SolutionLevel = "full" | "visual" | "partial" | "not-applicable";
+
+export interface GradeBand {
+  id: GradeBandId;
+  label: string;
+  grades: ExactGradeId[];
+  focus: string;
+}
+
+export interface FormatFamily {
+  id: WorksheetFormat;
+  title: string;
+  summary: string;
+  structure: string;
+  bestFor: string;
+}
+
+export interface AgentRole {
+  role: string;
+  owns: string;
+  output: string;
+}
+
+export interface WorksheetType {
+  id: string;
+  title: string;
+  strand: Strand;
+  grades: ExactGradeId[];
+  gradeBands: GradeBandId[];
+  summary: string;
+  controls: string[];
+  formats: WorksheetFormat[];
+  generatorKind: string;
+  validationRules: string[];
+  solution: { level: SolutionLevel; method: string };
+  params: Record<string, unknown>;
+}
+
+interface WorksheetTypeConfig {
+  controls: string[];
+  formats: WorksheetFormat[];
+  generatorKind: string;
+  validationRules: string[];
+  solution: WorksheetType["solution"];
+  params?: Record<string, unknown>;
+}
+
+export const gradeBands: GradeBand[] = [
   { id: "pk-k", label: "Pre-K/K", grades: ["0", "K"], focus: "counting, symbols, shapes, and early math language" },
   { id: "1-2", label: "Grades 1-2", grades: ["1", "2"], focus: "place value, addition/subtraction, time, money, and simple data" },
   { id: "3-5", label: "Grades 3-5", grades: ["3", "4", "5"], focus: "multi-digit operations, fractions, decimals, geometry, and word problems" },
@@ -6,7 +70,7 @@ const gradeBands = [
   { id: "9-12", label: "Grades 9-12", grades: ["9", "10", "11", "12"], focus: "algebra, geometry, statistics, financial math, and advanced functions" }
 ];
 
-const exactGrades = [
+export const exactGrades: { id: ExactGradeId; label: string }[] = [
   { id: "0", label: "Pre-K" },
   { id: "K", label: "K" },
   { id: "1", label: "1" },
@@ -23,7 +87,7 @@ const exactGrades = [
   { id: "12", label: "12" }
 ];
 
-const strands = [
+export const strands: Strand[] = [
   "Number Sense",
   "Operations and Fluency",
   "Fractions, Decimals, and Percents",
@@ -37,7 +101,7 @@ const strands = [
   "Math Puzzles, Logic, and Enrichment"
 ];
 
-const formatFamilies = [
+export const formatFamilies: FormatFamily[] = [
   {
     id: "fluency-grid",
     title: "Fluency Grid",
@@ -82,7 +146,7 @@ const formatFamilies = [
   }
 ];
 
-const agentTeam = [
+export const agentTeam: AgentRole[] = [
   {
     role: "Curriculum Mapper",
     owns: "grade-band and topic routing",
@@ -110,13 +174,13 @@ const agentTeam = [
   }
 ];
 
-function bandIdsForGrades(grades) {
+function bandIdsForGrades(grades: ExactGradeId[]): GradeBandId[] {
   return gradeBands
     .filter((band) => band.grades.some((grade) => grades.includes(grade)))
     .map((band) => band.id);
 }
 
-function makeType(title, strand, grades, summary, config) {
+function makeType(title: string, strand: Strand, grades: ExactGradeId[], summary: string, config: WorksheetTypeConfig): WorksheetType {
   return {
     id: title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
     title,
@@ -133,7 +197,7 @@ function makeType(title, strand, grades, summary, config) {
   };
 }
 
-const worksheetTypes = [
+const worksheetTypes: WorksheetType[] = [
   makeType("Number Recognition and Tracing", "Number Sense", ["0", "K"], "Generate numeral recognition, quantity matching, and trace-ready number prompts.", {
     generatorKind: "numberSense",
     formats: ["visual-model", "quick-check"],
@@ -400,7 +464,7 @@ const worksheetTypes = [
   })
 ];
 
-const expandedWorksheetTypes = [
+const expandedWorksheetTypes: WorksheetType[] = [
   makeType("Ten-Frame Counting Readiness", "Number Sense", ["K"], "Count objects in ten-frames and match totals to numerals.", {
     generatorKind: "numberSense",
     formats: ["visual-model", "quick-check"],
@@ -1125,1200 +1189,4 @@ const expandedWorksheetTypes = [
 
 worksheetTypes.push(...expandedWorksheetTypes);
 
-let activeBand = "";
-let activeGrade = "";
-let activeStrand = "";
-let activeFormat = "";
-let activeType = worksheetTypes[0];
-let activeWorksheetFormat = worksheetTypes[0].formats[0];
-let currentWorksheet = null;
-
-function createRng(seed) {
-  let state = Math.max(1, Math.floor(seed) % 2147483647);
-  return function next() {
-    state = state * 16807 % 2147483647;
-    return (state - 1) / 2147483646;
-  };
-}
-
-function hashString(value) {
-  return value.split("").reduce((hash, char) => ((hash << 5) - hash + char.charCodeAt(0)) | 0, 0);
-}
-
-function int(rng, min, max) {
-  return Math.floor(rng() * (max - min + 1)) + min;
-}
-
-function pick(rng, values) {
-  return values[int(rng, 0, values.length - 1)];
-}
-
-function gcd(a, b) {
-  let x = Math.abs(a);
-  let y = Math.abs(b);
-  while (y) {
-    const next = x % y;
-    x = y;
-    y = next;
-  }
-  return x || 1;
-}
-
-function simplifyFraction(numerator, denominator) {
-  const sign = denominator < 0 ? -1 : 1;
-  const divisor = gcd(numerator, denominator);
-  return {
-    numerator: sign * numerator / divisor,
-    denominator: Math.abs(denominator / divisor)
-  };
-}
-
-function formatFraction(fraction) {
-  if (fraction.denominator === 1) return String(fraction.numerator);
-  return `${fraction.numerator}/${fraction.denominator}`;
-}
-
-function money(cents) {
-  return (cents / 100).toFixed(2);
-}
-
-function formatTime(totalMinutes) {
-  const minutesInDay = ((totalMinutes % 1440) + 1440) % 1440;
-  const hour24 = Math.floor(minutesInDay / 60);
-  const minute = minutesInDay % 60;
-  const suffix = hour24 >= 12 ? "PM" : "AM";
-  const hour12 = hour24 % 12 || 12;
-  return `${hour12}:${String(minute).padStart(2, "0")} ${suffix}`;
-}
-
-function buildItem(type, index, rng) {
-  const number = index + 1;
-  switch (type.generatorKind) {
-    case "numberSense": {
-      const count = int(rng, 2, type.grades.includes("1") ? 20 : 10);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "numberSense",
-        number,
-        prompt: "How many dots are shown?",
-        format: "numeric",
-        data: { count },
-        visual: { kind: "dots", count },
-        feedback: "Count each dot once, then enter the total.",
-        steps: [`There are ${count} dots in the model.`, `The numeral is ${count}.`]
-      });
-    }
-    case "numberPattern": {
-      const start = int(rng, 4, 60);
-      const step = pick(rng, [2, 3, 5, 10]);
-      const missingIndex = int(rng, 2, 4);
-      const values = [0, 1, 2, 3, 4].map((offset) => start + offset * step);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "numberPattern",
-        number,
-        prompt: `Complete the pattern: ${values.map((value, i) => i === missingIndex ? "__" : value).join(", ")}`,
-        format: "numeric",
-        data: { answer: values[missingIndex], start, step, missingIndex },
-        feedback: `The pattern changes by ${step} each time.`,
-        steps: [`Start at ${start}.`, `Add ${step} for each move.`, `The blank is ${values[missingIndex]}.`]
-      });
-    }
-    case "compare": {
-      const allowNegative = type.grades.some((grade) => Number(grade) >= 6);
-      const a = int(rng, allowNegative ? -50 : 1, 999);
-      const b = int(rng, allowNegative ? -50 : 1, 999);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "compare",
-        number,
-        prompt: `Fill in the comparison sign: ${a} __ ${b}`,
-        format: "text",
-        data: { a, b },
-        feedback: "Use >, <, or =.",
-        steps: [`Compare ${a} and ${b}.`, `${a} is ${a > b ? "greater than" : a < b ? "less than" : "equal to"} ${b}.`]
-      });
-    }
-    case "placeValue": {
-      const hundreds = int(rng, 2, 8);
-      const tens = int(rng, 1, 9);
-      const ones = int(rng, 1, 9);
-      const num = hundreds * 100 + tens * 10 + ones;
-      const target = pick(rng, [
-        { digit: hundreds, value: hundreds * 100, place: "hundreds" },
-        { digit: tens, value: tens * 10, place: "tens" },
-        { digit: ones, value: ones, place: "ones" }
-      ]);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "placeValue",
-        number,
-        prompt: `In ${num}, what is the value of the digit ${target.digit} in the ${target.place} place?`,
-        format: "numeric",
-        data: { value: target.value },
-        feedback: "Match the digit to its place-value column.",
-        steps: [`The digit ${target.digit} is in the ${target.place} place.`, `Its value is ${target.value}.`]
-      });
-    }
-    case "rounding": {
-      const place = pick(rng, [10, 100]);
-      const value = int(rng, 100, 9999);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "rounding",
-        number,
-        prompt: `Round ${value} to the nearest ${place}.`,
-        format: "numeric",
-        data: { value, place },
-        feedback: "Check the digit to the right of the rounding place.",
-        steps: [`Find the ${place} place.`, `Use the digit to its right to decide whether to round up or down.`]
-      });
-    }
-    case "arithmetic": {
-      const operation = type.params.operation;
-      let a = int(rng, type.params.min, type.params.max);
-      let b = int(rng, type.params.min, type.params.max);
-      if (operation === "subtract" && b > a) [a, b] = [b, a];
-      const symbol = operation === "add" ? "+" : operation === "subtract" ? "-" : "x";
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "arithmetic",
-        number,
-        prompt: `${a} ${symbol} ${b} =`,
-        format: "numeric",
-        data: { a, b, operation },
-        feedback: "Recheck the operation and each place value.",
-        steps: arithmeticSteps(a, b, operation)
-      });
-    }
-    case "mixedOperations": {
-      const operation = pick(rng, ["add", "subtract", "multiply"]);
-      let a = int(rng, 5, 80);
-      let b = int(rng, 2, 25);
-      if (operation === "subtract" && b > a) [a, b] = [b, a];
-      const symbol = operation === "add" ? "+" : operation === "subtract" ? "-" : "x";
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "arithmetic",
-        number,
-        prompt: `${a} ${symbol} ${b} =`,
-        format: "numeric",
-        data: { a, b, operation },
-        feedback: "Check the operation sign before solving.",
-        steps: arithmeticSteps(a, b, operation)
-      });
-    }
-    case "factFamily": {
-      const a = int(rng, 3, 12);
-      const b = int(rng, 2, 12);
-      const sum = a + b;
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "factFamily",
-        number,
-        prompt: `Complete the fact family: ${a} + ${b} = ${sum}; ${sum} - ${a} = __`,
-        format: "numeric",
-        data: { answer: b },
-        feedback: "Use the inverse subtraction fact.",
-        steps: [`The addition fact is ${a} + ${b} = ${sum}.`, `The related subtraction fact is ${sum} - ${a} = ${b}.`]
-      });
-    }
-    case "division": {
-      const divisor = int(rng, 2, 12);
-      const quotient = int(rng, 2, 15);
-      const dividend = divisor * quotient;
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "division",
-        number,
-        prompt: `${dividend} / ${divisor} =`,
-        format: "numeric",
-        data: { dividend, divisor, quotient },
-        feedback: "Use multiplication to check your quotient.",
-        steps: [`Ask: ${divisor} times what equals ${dividend}?`, `${divisor} x ${quotient} = ${dividend}.`]
-      });
-    }
-    case "orderOps": {
-      const a = int(rng, 2, 9);
-      const b = int(rng, 2, 9);
-      const c = int(rng, 2, 6);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "orderOps",
-        number,
-        prompt: `(${a} + ${b}) x ${c} =`,
-        format: "numeric",
-        data: { a, b, c },
-        feedback: "Simplify inside parentheses first.",
-        steps: [`Parentheses: ${a} + ${b} = ${a + b}.`, `Multiply: ${a + b} x ${c} = ${(a + b) * c}.`]
-      });
-    }
-    case "fractionModel": {
-      const denominator = int(rng, 3, 10);
-      const numerator = int(rng, 1, denominator - 1);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "fractionModel",
-        number,
-        prompt: "What fraction of the bar is shaded?",
-        format: "fraction",
-        data: { numerator, denominator },
-        visual: { kind: "fractionBar", numerator, denominator },
-        feedback: "Write shaded parts over total equal parts.",
-        steps: [`There are ${numerator} shaded parts.`, `There are ${denominator} total equal parts.`, `The fraction is ${numerator}/${denominator}.`]
-      });
-    }
-    case "simplifyFraction": {
-      const numerator = int(rng, 2, 8);
-      const denominator = int(rng, numerator + 1, 12);
-      const multiplier = int(rng, 2, 5);
-      const rawN = numerator * multiplier;
-      const rawD = denominator * multiplier;
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "simplifyFraction",
-        number,
-        prompt: `Simplify ${rawN}/${rawD}.`,
-        format: "fraction",
-        data: { numerator: rawN, denominator: rawD },
-        feedback: "Divide numerator and denominator by their greatest common factor.",
-        steps: [`The GCF of ${rawN} and ${rawD} is ${gcd(rawN, rawD)}.`, `Divide both parts by ${gcd(rawN, rawD)}.`]
-      });
-    }
-    case "fractionOps": {
-      const denominator = int(rng, 4, 12);
-      const a = int(rng, 1, denominator - 2);
-      const b = int(rng, 1, denominator - a - 1);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "fractionAdd",
-        number,
-        prompt: `${a}/${denominator} + ${b}/${denominator} =`,
-        format: "fraction",
-        data: { a, b, denominator },
-        feedback: "The denominators match, so add the numerators.",
-        steps: [`Add numerators: ${a} + ${b} = ${a + b}.`, `Keep denominator ${denominator}.`, `Simplify if possible.`]
-      });
-    }
-    case "decimalOps": {
-      const aCents = int(rng, 125, 950);
-      const bCents = int(rng, 25, 875);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "decimalAdd",
-        number,
-        prompt: `${money(aCents)} + ${money(bCents)} =`,
-        format: "decimal",
-        data: { aCents, bCents },
-        feedback: "Line up the decimal points before adding.",
-        steps: [`Add cents: ${aCents} + ${bCents} = ${aCents + bCents}.`, `Write as dollars: ${money(aCents + bCents)}.`]
-      });
-    }
-    case "conversion": {
-      const denominator = pick(rng, [4, 5, 10, 20]);
-      const numerator = int(rng, 1, denominator - 1);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "fractionToPercent",
-        number,
-        prompt: `Convert ${numerator}/${denominator} to a percent.`,
-        format: "percent",
-        data: { numerator, denominator },
-        feedback: "Scale the denominator to 100 or divide.",
-        steps: [`${numerator} / ${denominator} = ${numerator / denominator}.`, `Multiply by 100 to get the percent.`]
-      });
-    }
-    case "ratio": {
-      const unit = int(rng, 2, 9);
-      const start = int(rng, 2, 6);
-      const target = int(rng, 7, 14);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "ratio",
-        number,
-        prompt: `${start} notebooks cost $${start * unit}. How much do ${target} notebooks cost?`,
-        format: "money",
-        data: { unit, target },
-        feedback: "Find the cost of one notebook first.",
-        steps: [`Unit rate: $${start * unit} / ${start} = $${unit}.`, `${target} notebooks cost ${target} x $${unit}.`]
-      });
-    }
-    case "percent": {
-      const percent = pick(rng, [10, 15, 20, 25, 30, 40, 50]);
-      const base = int(rng, 20, 200);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "percent",
-        number,
-        prompt: `What is ${percent}% of ${base}?`,
-        format: "decimal",
-        data: { percent, base },
-        feedback: "Convert the percent to a decimal, then multiply.",
-        steps: [`${percent}% = ${percent / 100}.`, `${percent / 100} x ${base} = ${base * percent / 100}.`]
-      });
-    }
-    case "integerOps": {
-      const a = int(rng, -30, 30);
-      const b = int(rng, -30, 30);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "integerAdd",
-        number,
-        prompt: `${a} + (${b}) =`,
-        format: "numeric",
-        data: { a, b },
-        feedback: "Think of the second integer as movement on the number line.",
-        steps: [`Start at ${a}.`, `Move ${Math.abs(b)} ${b >= 0 ? "right" : "left"}.`]
-      });
-    }
-    case "gcf": {
-      const factor = int(rng, 2, 9);
-      const a = factor * int(rng, 2, 8);
-      const b = factor * int(rng, 2, 8);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "gcf",
-        number,
-        prompt: `Find the greatest common factor of ${a} and ${b}.`,
-        format: "numeric",
-        data: { a, b },
-        feedback: "List factors of both numbers, then choose the greatest shared one.",
-        steps: [`Factors of ${a} and ${b} share at least ${factor}.`, `Compare all shared factors to find the greatest.`]
-      });
-    }
-    case "exponent": {
-      const base = int(rng, 2, 9);
-      const exponent = int(rng, 2, 4);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "exponent",
-        number,
-        prompt: `${base}^${exponent} =`,
-        format: "numeric",
-        data: { base, exponent },
-        feedback: "Multiply the base by itself repeatedly.",
-        steps: [`Use ${exponent} factors of ${base}.`, `${base}^${exponent} = ${base ** exponent}.`]
-      });
-    }
-    case "algebra": {
-      const x = int(rng, -8, 12);
-      const a = int(rng, 2, 9);
-      const b = int(rng, -10, 15);
-      const c = a * x + b;
-      const sign = b >= 0 ? "+" : "-";
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "algebra",
-        number,
-        prompt: `Solve for x: ${a}x ${sign} ${Math.abs(b)} = ${c}`,
-        format: "numeric",
-        data: { a, b, c },
-        feedback: "Undo the constant first, then divide by the coefficient.",
-        steps: [`Subtract ${b} from both sides: ${a}x = ${c - b}.`, `Divide by ${a}: x = ${(c - b) / a}.`]
-      });
-    }
-    case "functionTable": {
-      const m = int(rng, 2, 8);
-      const b = int(rng, -5, 9);
-      const x = int(rng, -4, 10);
-      const sign = b >= 0 ? "+" : "-";
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "functionTable",
-        number,
-        prompt: `For y = ${m}x ${sign} ${Math.abs(b)}, find y when x = ${x}.`,
-        format: "numeric",
-        data: { m, b, x },
-        feedback: "Substitute the x-value into the rule.",
-        steps: [`Replace x with ${x}: y = ${m}(${x}) ${sign} ${Math.abs(b)}.`, `Compute y = ${m * x + b}.`]
-      });
-    }
-    case "coordinate": {
-      const x = int(rng, -6, 6);
-      const y = int(rng, -6, 6);
-      const dx = int(rng, -4, 4) || 2;
-      const dy = int(rng, -4, 4) || -3;
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "coordinate",
-        number,
-        prompt: `Point A is (${x}, ${y}). Translate it ${Math.abs(dx)} ${dx >= 0 ? "right" : "left"} and ${Math.abs(dy)} ${dy >= 0 ? "up" : "down"}. What is the new point?`,
-        format: "coordinate",
-        data: { x, y, dx, dy },
-        feedback: "Horizontal movement changes x; vertical movement changes y.",
-        steps: [`New x: ${x} ${dx >= 0 ? "+" : "-"} ${Math.abs(dx)} = ${x + dx}.`, `New y: ${y} ${dy >= 0 ? "+" : "-"} ${Math.abs(dy)} = ${y + dy}.`]
-      });
-    }
-    case "geometry": {
-      const facts = [
-        { shape: "triangle", property: "sides", answer: 3 },
-        { shape: "quadrilateral", property: "sides", answer: 4 },
-        { shape: "pentagon", property: "sides", answer: 5 },
-        { shape: "hexagon", property: "sides", answer: 6 },
-        { shape: "octagon", property: "sides", answer: 8 }
-      ];
-      const fact = pick(rng, facts);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "knownFact",
-        number,
-        prompt: `How many ${fact.property} does a ${fact.shape} have?`,
-        format: "numeric",
-        data: { answer: fact.answer },
-        feedback: "Use the shape name and count its sides.",
-        steps: [`A ${fact.shape} has ${fact.answer} sides.`]
-      });
-    }
-    case "area": {
-      const length = int(rng, 3, 18);
-      const width = int(rng, 2, 12);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "area",
-        number,
-        prompt: `Find the area of a rectangle with length ${length} units and width ${width} units.`,
-        format: "numeric",
-        data: { length, width },
-        feedback: "Area of a rectangle is length times width.",
-        steps: [`A = length x width.`, `A = ${length} x ${width} = ${length * width}.`]
-      });
-    }
-    case "measurement": {
-      const meters = int(rng, 2, 25);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "measurement",
-        number,
-        prompt: `Convert ${meters} meters to centimeters.`,
-        format: "numeric",
-        data: { meters },
-        feedback: "One meter equals 100 centimeters.",
-        steps: [`${meters} x 100 = ${meters * 100}.`, `${meters} meters = ${meters * 100} centimeters.`]
-      });
-    }
-    case "time": {
-      const start = int(rng, 8 * 60, 16 * 60);
-      const duration = pick(rng, [25, 30, 45, 60, 75, 90, 120]);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "time",
-        number,
-        prompt: `A lesson starts at ${formatTime(start)} and lasts ${duration} minutes. What time does it end?`,
-        format: "text",
-        data: { start, duration },
-        feedback: "Add the minutes to the start time.",
-        steps: [`Start at ${formatTime(start)}.`, `Add ${duration} minutes.`, `End time: ${formatTime(start + duration)}.`]
-      });
-    }
-    case "money": {
-      const price = int(rng, 125, 1975);
-      const payment = Math.ceil((price + int(rng, 100, 900)) / 500) * 500;
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "money",
-        number,
-        prompt: `An item costs $${money(price)}. You pay $${money(payment)}. How much change should you get?`,
-        format: "money",
-        data: { price, payment },
-        feedback: "Subtract the price from the payment.",
-        steps: [`Change = $${money(payment)} - $${money(price)}.`, `Change = $${money(payment - price)}.`]
-      });
-    }
-    case "mean": {
-      const values = [int(rng, 4, 20), int(rng, 4, 20), int(rng, 4, 20), int(rng, 4, 20)];
-      const sum = values.reduce((total, value) => total + value, 0);
-      values[3] += (4 - sum % 4) % 4;
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "mean",
-        number,
-        prompt: `Find the mean of: ${values.join(", ")}.`,
-        format: "decimal",
-        data: { values },
-        feedback: "Add all values, then divide by how many values there are.",
-        steps: [`Sum: ${values.join(" + ")} = ${values.reduce((total, value) => total + value, 0)}.`, `Divide by ${values.length}.`]
-      });
-    }
-    case "probability": {
-      const favorable = int(rng, 1, 6);
-      const total = int(rng, favorable + 1, 12);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "probability",
-        number,
-        prompt: `A bag has ${favorable} blue marbles and ${total - favorable} red marbles. What is the probability of drawing a blue marble?`,
-        format: "fraction",
-        data: { favorable, total },
-        feedback: "Probability is favorable outcomes over total outcomes.",
-        steps: [`Favorable outcomes: ${favorable}.`, `Total outcomes: ${total}.`, `Probability: ${favorable}/${total}, simplified if possible.`]
-      });
-    }
-    case "wordProblem": {
-      const boxes = int(rng, 3, 12);
-      const perBox = int(rng, 4, 24);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "wordProblem",
-        number,
-        prompt: `A teacher has ${boxes} boxes with ${perBox} pencils in each box. How many pencils are there altogether?`,
-        format: "numeric",
-        data: { boxes, perBox },
-        feedback: "Equal groups usually mean multiplication.",
-        steps: [`There are ${boxes} equal groups.`, `Each group has ${perBox}.`, `${boxes} x ${perBox} = ${boxes * perBox}.`]
-      });
-    }
-    case "patternPuzzle": {
-      const start = int(rng, 2, 18);
-      const firstDiff = int(rng, 2, 6);
-      const values = [start];
-      for (let i = 1; i < 5; i += 1) values.push(values[i - 1] + firstDiff * i);
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "knownFact",
-        number,
-        prompt: `Find the next number: ${values.slice(0, 4).join(", ")}, __`,
-        format: "numeric",
-        data: { answer: values[4] },
-        feedback: "Look at how the differences change.",
-        steps: [`The differences are ${firstDiff}, ${firstDiff * 2}, ${firstDiff * 3}, then ${firstDiff * 4}.`, `Add ${firstDiff * 4} to ${values[3]}.`]
-      });
-    }
-    default:
-      return finalizeItem({
-        id: `q${number}`,
-        kind: "knownFact",
-        number,
-        prompt: "Solve the generated math item.",
-        format: "numeric",
-        data: { answer: 0 },
-        feedback: "Check the generated model.",
-        steps: ["No solution method is configured yet."]
-      });
-  }
-}
-
-function arithmeticSteps(a, b, operation) {
-  if (operation === "add") return [`Add ${a} and ${b}.`, `The sum is ${a + b}.`];
-  if (operation === "subtract") return [`Subtract ${b} from ${a}.`, `The difference is ${a - b}.`];
-  return [`Multiply ${a} by ${b}.`, `The product is ${a * b}.`];
-}
-
-function finalizeItem(item) {
-  const answer = solveItem(item);
-  const normalizer = item.format === "fraction"
-    ? "fraction"
-    : item.format === "coordinate"
-      ? "coordinate"
-      : ["decimal", "money", "percent"].includes(item.format)
-        ? "number"
-        : item.format === "numeric"
-          ? "number"
-          : "text";
-  return {
-    ...item,
-    studentInput: "",
-    validation: { status: "unanswered", attempts: 0 },
-    answerKey: {
-      value: String(answer),
-      alternates: item.alternates || [],
-      tolerance: item.format === "decimal" || item.format === "money" ? 0.01 : 0,
-      normalize: normalizer,
-      orderInsensitive: Boolean(item.orderInsensitive)
-    }
-  };
-}
-
-function solveItem(item) {
-  const data = item.data;
-  switch (item.kind) {
-    case "numberSense":
-    case "numberPattern":
-    case "placeValue":
-    case "factFamily":
-    case "knownFact":
-      return data.answer ?? data.value ?? data.count;
-    case "compare":
-      return data.a > data.b ? ">" : data.a < data.b ? "<" : "=";
-    case "rounding":
-      return Math.round(data.value / data.place) * data.place;
-    case "arithmetic":
-      if (data.operation === "add") return data.a + data.b;
-      if (data.operation === "subtract") return data.a - data.b;
-      return data.a * data.b;
-    case "division":
-      return data.quotient;
-    case "orderOps":
-      return (data.a + data.b) * data.c;
-    case "fractionModel":
-      return formatFraction(simplifyFraction(data.numerator, data.denominator));
-    case "simplifyFraction":
-      return formatFraction(simplifyFraction(data.numerator, data.denominator));
-    case "fractionAdd":
-      return formatFraction(simplifyFraction(data.a + data.b, data.denominator));
-    case "decimalAdd":
-      return money(data.aCents + data.bCents);
-    case "fractionToPercent":
-      return `${Number((data.numerator / data.denominator * 100).toFixed(2))}%`;
-    case "ratio":
-      return money(data.unit * data.target * 100);
-    case "percent":
-      return Number((data.base * data.percent / 100).toFixed(2));
-    case "integerAdd":
-      return data.a + data.b;
-    case "gcf":
-      return gcd(data.a, data.b);
-    case "exponent":
-      return data.base ** data.exponent;
-    case "algebra":
-      return (data.c - data.b) / data.a;
-    case "functionTable":
-      return data.m * data.x + data.b;
-    case "coordinate":
-      return `(${data.x + data.dx}, ${data.y + data.dy})`;
-    case "area":
-      return data.length * data.width;
-    case "measurement":
-      return data.meters * 100;
-    case "time":
-      return formatTime(data.start + data.duration);
-    case "money":
-      return money(data.payment - data.price);
-    case "mean":
-      return Number((data.values.reduce((total, value) => total + value, 0) / data.values.length).toFixed(2));
-    case "probability":
-      return formatFraction(simplifyFraction(data.favorable, data.total));
-    case "wordProblem":
-      return data.boxes * data.perBox;
-    default:
-      return "";
-  }
-}
-
-function generateWorksheet(type) {
-  const itemCount = clamp(Number(document.getElementById("itemCount").value) || 6, 3, 12);
-  const seed = Number(document.getElementById("seedInput").value) || 42;
-  const rng = createRng(seed + Math.abs(hashString(type.id)));
-  const items = Array.from({ length: itemCount }, (_, index) => buildItem(type, index, rng));
-  const worksheet = {
-    id: `${type.id}-${seed}`,
-    title: type.title,
-    strand: type.strand,
-    grades: type.grades,
-    format: activeWorksheetFormat,
-    settings: {
-      itemCount,
-      seed,
-      showSteps: type.solution.level !== "not-applicable",
-      revealPolicy: "after-check"
-    },
-    items,
-    summary: summarizeItems(items)
-  };
-  worksheet.audit = auditWorksheet(worksheet);
-  return worksheet;
-}
-
-function auditWorksheet(worksheet) {
-  const results = worksheet.items.map((item) => {
-    const solved = String(solveItem(item));
-    return {
-      id: item.id,
-      expected: item.answerKey.value,
-      solved,
-      ok: equivalentAnswer(solved, item.answerKey.value, item.answerKey)
-    };
-  });
-  return {
-    ok: results.every((result) => result.ok),
-    checked: results.length,
-    failed: results.filter((result) => !result.ok)
-  };
-}
-
-function equivalentAnswer(left, right, answerKey) {
-  if (answerKey.normalize === "fraction") return sameFraction(left, right);
-  if (answerKey.normalize === "coordinate") return normalizeCoordinate(left) === normalizeCoordinate(right);
-  if (answerKey.normalize === "number") {
-    const a = Number(String(left).replace(/[$,%]/g, ""));
-    const b = Number(String(right).replace(/[$,%]/g, ""));
-    if (Number.isNaN(a) || Number.isNaN(b)) return normalizeText(left) === normalizeText(right);
-    return Math.abs(a - b) <= (answerKey.tolerance || 0);
-  }
-  return normalizeText(left) === normalizeText(right);
-}
-
-function sameFraction(left, right) {
-  const a = parseFraction(left);
-  const b = parseFraction(right);
-  if (!a || !b) return normalizeText(left) === normalizeText(right);
-  return a.numerator * b.denominator === b.numerator * a.denominator;
-}
-
-function parseFraction(value) {
-  const raw = String(value).trim();
-  if (/^-?\d+(\.\d+)?$/.test(raw)) {
-    return { numerator: Number(raw), denominator: 1 };
-  }
-  const match = raw.match(/^(-?\d+)\s*\/\s*(-?\d+)$/);
-  if (!match || Number(match[2]) === 0) return null;
-  return { numerator: Number(match[1]), denominator: Number(match[2]) };
-}
-
-function normalizeCoordinate(value) {
-  return String(value).replace(/[()\s]/g, "").toLowerCase();
-}
-
-function normalizeText(value) {
-  return String(value).trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-function isCorrect(input, answerKey) {
-  const candidates = [answerKey.value, ...answerKey.alternates];
-  return candidates.some((candidate) => equivalentAnswer(input, candidate, answerKey));
-}
-
-function summarizeItems(items) {
-  const correct = items.filter((item) => item.validation.status === "correct").length;
-  const incorrect = items.filter((item) => item.validation.status === "incorrect").length;
-  const unanswered = items.length - correct - incorrect;
-  return {
-    correct,
-    incorrect,
-    unanswered,
-    score: items.length ? Math.round(correct / items.length * 100) : 0
-  };
-}
-
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function renderFilters() {
-  document.getElementById("exactGradeFilters").innerHTML = exactGrades.map((grade) => `
-    <button class="grade-button ${activeGrade === grade.id ? "active" : ""}" data-grade="${grade.id}" type="button">${grade.label}</button>
-  `).join("");
-
-  document.getElementById("gradeBandFilters").innerHTML = gradeBands.map((band) => `
-    <button class="filter-button ${activeBand === band.id ? "active" : ""}" data-band="${band.id}" type="button">${band.label}</button>
-  `).join("");
-
-  document.getElementById("strandFilters").innerHTML = strands.map((strand) => `
-    <button class="filter-button ${activeStrand === strand ? "active" : ""}" data-strand="${strand}" type="button">${strand}</button>
-  `).join("");
-
-  document.getElementById("formatFilters").innerHTML = formatFamilies.map((format) => `
-    <button class="filter-button ${activeFormat === format.id ? "active" : ""}" data-format="${format.id}" type="button">${format.title}</button>
-  `).join("");
-}
-
-function renderCoverage() {
-  document.getElementById("totalTypeCount").textContent = worksheetTypes.length;
-  document.getElementById("totalFormatCount").textContent = formatFamilies.length;
-}
-
-function renderAgents() {
-  document.getElementById("agentGrid").innerHTML = agentTeam.map((agent) => `
-    <article class="agent-card">
-      <span>${agent.owns}</span>
-      <h3>${agent.role}</h3>
-      <p>${agent.output}</p>
-    </article>
-  `).join("");
-}
-
-function renderGradeMap() {
-  document.getElementById("gradeMapGrid").innerHTML = gradeBands.map((band) => {
-    const types = worksheetTypes.filter((type) => type.gradeBands.includes(band.id));
-    const grouped = strands
-      .map((strand) => ({ strand, count: types.filter((type) => type.strand === strand).length }))
-      .filter((item) => item.count > 0);
-    return `
-      <article class="grade-band-card">
-        <h3>${band.label}</h3>
-        <p>${band.focus}</p>
-        <div class="mini-list">
-          ${grouped.map((item) => `<span>${item.strand} <strong>${item.count}</strong></span>`).join("")}
-        </div>
-      </article>
-    `;
-  }).join("");
-}
-
-function renderFormats() {
-  document.getElementById("formatGrid").innerHTML = formatFamilies.map((format) => `
-    <article class="format-card">
-      <h3>${format.title}</h3>
-      <p>${format.summary}</p>
-      <dl>
-        <dt>Structure</dt>
-        <dd>${format.structure}</dd>
-        <dt>Best for</dt>
-        <dd>${format.bestFor}</dd>
-      </dl>
-    </article>
-  `).join("");
-}
-
-function getFilteredTypes() {
-  const query = document.getElementById("searchInput").value.trim().toLowerCase();
-  return worksheetTypes.filter((type) => {
-    const haystack = [
-      type.title,
-      type.strand,
-      type.summary,
-      type.controls.join(" "),
-      type.formats.join(" "),
-      type.validationRules.join(" "),
-      type.solution.method
-    ].join(" ").toLowerCase();
-
-    return (!query || haystack.includes(query))
-      && (!activeGrade || type.grades.includes(activeGrade))
-      && (!activeBand || type.gradeBands.includes(activeBand))
-      && (!activeStrand || type.strand === activeStrand)
-      && (!activeFormat || type.formats.includes(activeFormat));
-  });
-}
-
-function renderTypes() {
-  const typeGrid = document.getElementById("typeGrid");
-  const filtered = getFilteredTypes();
-  document.getElementById("visibleCount").textContent = filtered.length;
-
-  if (!filtered.length) {
-    typeGrid.innerHTML = `<div class="empty-state">No math generators match those filters.</div>`;
-    return;
-  }
-
-  typeGrid.innerHTML = filtered.map((type) => `
-    <button class="type-card ${activeType.id === type.id ? "selected" : ""}" data-type="${type.id}" type="button">
-      <div class="type-kicker">
-        <span>${type.strand}</span>
-        <span>${type.solution.level}</span>
-      </div>
-      <h3>${type.title}</h3>
-      <p>${type.summary}</p>
-      <div class="chip-row">
-        <span class="chip">${formatGrades(type.grades)}</span>
-        ${type.formats.slice(0, 2).map((formatId) => `<span class="chip">${formatTitle(formatId)}</span>`).join("")}
-      </div>
-    </button>
-  `).join("");
-}
-
-function renderBlueprint(type) {
-  activeType = type;
-  if (activeFormat && type.formats.includes(activeFormat)) activeWorksheetFormat = activeFormat;
-  if (!type.formats.includes(activeWorksheetFormat)) activeWorksheetFormat = type.formats[0];
-  document.getElementById("blueprintTitle").textContent = type.title;
-  document.getElementById("blueprintSummary").textContent = type.summary;
-  document.getElementById("statusType").textContent = type.title;
-
-  document.getElementById("blueprintMeta").innerHTML = `
-    <div class="meta-box"><small>Strand</small>${type.strand}</div>
-    <div class="meta-box"><small>Grades</small>${formatGrades(type.grades)}</div>
-    <div class="meta-box"><small>Format</small>${formatTitle(activeWorksheetFormat)}</div>
-    <div class="meta-box"><small>Solutions</small>${type.solution.level}</div>
-  `;
-
-  document.getElementById("formatOptionList").innerHTML = type.formats.map((formatId) => {
-    const format = formatFamilies.find((item) => item.id === formatId);
-    return `
-      <button class="format-choice ${activeWorksheetFormat === formatId ? "active" : ""}" data-worksheet-format="${formatId}" type="button">
-        <strong>${formatTitle(formatId)}</strong>
-        <span>${format ? format.bestFor : "worksheet practice"}</span>
-      </button>
-    `;
-  }).join("");
-
-  document.getElementById("controlList").innerHTML = type.controls.map((control) => `<li>${control}</li>`).join("");
-  document.getElementById("validationList").innerHTML = type.validationRules.map((rule) => `<li>${rule}</li>`).join("");
-  document.getElementById("solutionSummary").textContent = `${type.solution.level}: ${type.solution.method}`;
-  document.getElementById("copyStatus").textContent = "";
-
-  currentWorksheet = generateWorksheet(type);
-  renderWorksheet(currentWorksheet);
-  renderTypes();
-}
-
-function renderWorksheet(worksheet) {
-  const stage = document.getElementById("worksheetStage");
-  const auditClass = worksheet.audit.ok ? "pass" : "fail";
-  document.getElementById("statusAudit").textContent = worksheet.audit.ok
-    ? `${worksheet.audit.checked}/${worksheet.audit.checked} valid`
-    : `${worksheet.audit.failed.length} failed`;
-
-  stage.innerHTML = `
-    <article class="worksheet-page format-${escapeHtml(worksheet.format)}" aria-label="${escapeHtml(worksheet.title)} worksheet">
-      <header class="worksheet-header">
-        <div>
-          <p class="eyebrow">Student page</p>
-          <h3>${escapeHtml(worksheet.title)}</h3>
-          <p>${escapeHtml(worksheet.strand)} | ${escapeHtml(formatGrades(worksheet.grades))} | ${escapeHtml(formatTitle(worksheet.format))}</p>
-        </div>
-        <div class="student-fields">
-          <span>Name</span>
-          <span>Date</span>
-        </div>
-      </header>
-
-      <p class="worksheet-directions">${escapeHtml(formatDirections(worksheet.format))}</p>
-
-      <div class="worksheet-summary digital-controls">
-        <span class="audit-badge ${auditClass}">Answer key audit: ${worksheet.audit.ok ? "passed" : "failed"}</span>
-        <span>${worksheet.summary.correct} correct</span>
-        <span>${worksheet.summary.incorrect} incorrect</span>
-        <span>${worksheet.summary.unanswered} unanswered</span>
-      </div>
-
-      <ol class="worksheet-items">
-        ${worksheet.items.map(renderWorksheetItem).join("")}
-      </ol>
-    </article>
-
-    <article class="answer-key-page">
-      <p class="eyebrow">Teacher page</p>
-      <h3>Answer Key and Step Notes</h3>
-      <ol>
-        ${worksheet.items.map((item) => `
-          <li>
-            <strong>${escapeHtml(item.answerKey.value)}</strong>
-            <span>${escapeHtml(item.steps.join(" "))}</span>
-          </li>
-        `).join("")}
-      </ol>
-    </article>
-  `;
-}
-
-function renderWorksheetItem(item) {
-  const status = item.validation.status;
-  return `
-    <li class="worksheet-item ${status}" data-item-id="${item.id}">
-      <div class="item-body">
-        <p class="item-prompt">${escapeHtml(item.prompt)}</p>
-        ${renderVisual(item.visual)}
-        <label class="answer-field">
-          <span>Answer ${item.number}</span>
-          <input value="${escapeHtml(item.studentInput)}" data-answer-input="${item.id}" aria-label="Answer for item ${item.number}" autocomplete="off">
-        </label>
-        <div class="item-actions digital-controls">
-          <button class="mini-button" data-check-item="${item.id}" type="button">Check</button>
-          <span class="status-badge">${statusLabel(status)}</span>
-        </div>
-        <p class="feedback" aria-live="polite">${feedbackText(item)}</p>
-        ${item.steps.length ? `
-          <details class="steps digital-controls">
-            <summary>Steps</summary>
-            <ol>${item.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
-          </details>
-        ` : ""}
-      </div>
-    </li>
-  `;
-}
-
-function renderVisual(visual) {
-  if (!visual) return "";
-  if (visual.kind === "dots") {
-    return `<div class="dot-model" aria-label="${visual.count} dots">${Array.from({ length: visual.count }, () => "<span></span>").join("")}</div>`;
-  }
-  if (visual.kind === "fractionBar") {
-    return `
-      <div class="fraction-bar" aria-label="${visual.numerator} of ${visual.denominator} parts shaded">
-        ${Array.from({ length: visual.denominator }, (_, index) => `<span class="${index < visual.numerator ? "filled" : ""}"></span>`).join("")}
-      </div>
-    `;
-  }
-  return "";
-}
-
-function checkItem(item) {
-  item.validation.attempts += 1;
-  item.validation.status = item.studentInput.trim()
-    ? isCorrect(item.studentInput, item.answerKey) ? "correct" : "incorrect"
-    : "unanswered";
-}
-
-function checkAllAnswers() {
-  currentWorksheet.items.forEach(checkItem);
-  currentWorksheet.summary = summarizeItems(currentWorksheet.items);
-  renderWorksheet(currentWorksheet);
-}
-
-function statusLabel(status) {
-  if (status === "correct") return "Correct";
-  if (status === "incorrect") return "Try again";
-  return "Unanswered";
-}
-
-function feedbackText(item) {
-  if (item.validation.status === "correct") return "Correct.";
-  if (item.validation.status === "incorrect") return item.feedback;
-  return "Enter an answer, then check it.";
-}
-
-function formatGrades(grades) {
-  return grades.map((grade) => grade === "0" ? "Pre-K" : grade).join(", ");
-}
-
-function formatTitle(formatId) {
-  const format = formatFamilies.find((item) => item.id === formatId);
-  return format ? format.title : formatId;
-}
-
-function formatDirections(formatId) {
-  const directions = {
-    "fluency-grid": "Solve each item neatly. Use the answer boxes for quick fluency practice.",
-    "worked-practice": "Show your work for each item. Use the step notes after checking your answer.",
-    "visual-model": "Use the model, diagram, or representation before entering an answer.",
-    "graph-data": "Read the table, graph, coordinates, or data display carefully before solving.",
-    "real-world": "Track the quantities in the situation, then label each answer with units.",
-    "quick-check": "Answer each item, check your work, and use feedback to retry."
-  };
-  return directions[formatId] || "Solve each item and check your work.";
-}
-
-function resetFilters() {
-  activeBand = "";
-  activeGrade = "";
-  activeStrand = "";
-  activeFormat = "";
-  document.getElementById("searchInput").value = "";
-  renderFilters();
-  renderTypes();
-}
-
-function getSpecText() {
-  return [
-    `Generate a self-checking HTML math worksheet for ${activeType.title}.`,
-    `Grades: ${formatGrades(activeType.grades)}.`,
-    `Strand: ${activeType.strand}.`,
-    `Format family: ${activeType.formats.map(formatTitle).join(", ")}.`,
-    `Controls: ${activeType.controls.join(", ")}.`,
-    `Validation: ${activeType.validationRules.join("; ")}.`,
-    `Step solution plan: ${activeType.solution.level} - ${activeType.solution.method}.`,
-    "Each item must include prompt, structured data, answerKey, audit solver, student input, feedback, and print-safe layout."
-  ].join("\n");
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function bindEvents() {
-  document.getElementById("exactGradeFilters").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-grade]");
-    if (!button) return;
-    activeGrade = activeGrade === button.dataset.grade ? "" : button.dataset.grade;
-    if (activeGrade) activeBand = "";
-    renderFilters();
-    renderTypes();
-  });
-
-  document.getElementById("gradeBandFilters").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-band]");
-    if (!button) return;
-    activeBand = activeBand === button.dataset.band ? "" : button.dataset.band;
-    if (activeBand) activeGrade = "";
-    renderFilters();
-    renderTypes();
-  });
-
-  document.getElementById("strandFilters").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-strand]");
-    if (!button) return;
-    activeStrand = activeStrand === button.dataset.strand ? "" : button.dataset.strand;
-    renderFilters();
-    renderTypes();
-  });
-
-  document.getElementById("formatFilters").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-format]");
-    if (!button) return;
-    activeFormat = activeFormat === button.dataset.format ? "" : button.dataset.format;
-    renderFilters();
-    renderTypes();
-  });
-
-  document.getElementById("typeGrid").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-type]");
-    if (!button) return;
-    const type = worksheetTypes.find((item) => item.id === button.dataset.type);
-    if (type) renderBlueprint(type);
-  });
-
-  document.getElementById("formatOptionList").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-worksheet-format]");
-    if (!button) return;
-    activeWorksheetFormat = button.dataset.worksheetFormat;
-    renderBlueprint(activeType);
-  });
-
-  document.getElementById("worksheetStage").addEventListener("input", (event) => {
-    const input = event.target.closest("[data-answer-input]");
-    if (!input || !currentWorksheet) return;
-    const item = currentWorksheet.items.find((entry) => entry.id === input.dataset.answerInput);
-    if (item) item.studentInput = input.value;
-  });
-
-  document.getElementById("worksheetStage").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-check-item]");
-    if (!button || !currentWorksheet) return;
-    const item = currentWorksheet.items.find((entry) => entry.id === button.dataset.checkItem);
-    if (!item) return;
-    checkItem(item);
-    currentWorksheet.summary = summarizeItems(currentWorksheet.items);
-    renderWorksheet(currentWorksheet);
-  });
-
-  document.getElementById("searchInput").addEventListener("input", renderTypes);
-  document.getElementById("itemCount").addEventListener("change", () => renderBlueprint(activeType));
-  document.getElementById("seedInput").addEventListener("change", () => renderBlueprint(activeType));
-  document.getElementById("resetFilters").addEventListener("click", resetFilters);
-  document.getElementById("clearGrade").addEventListener("click", () => {
-    activeGrade = "";
-    renderFilters();
-    renderTypes();
-  });
-  document.getElementById("clearBand").addEventListener("click", () => {
-    activeBand = "";
-    renderFilters();
-    renderTypes();
-  });
-  document.getElementById("clearStrand").addEventListener("click", () => {
-    activeStrand = "";
-    renderFilters();
-    renderTypes();
-  });
-  document.getElementById("clearFormat").addEventListener("click", () => {
-    activeFormat = "";
-    renderFilters();
-    renderTypes();
-  });
-
-  document.getElementById("generateWorksheet").addEventListener("click", () => renderBlueprint(activeType));
-  document.getElementById("checkAnswers").addEventListener("click", checkAllAnswers);
-  document.getElementById("printWorksheet").addEventListener("click", () => window.print());
-  document.getElementById("copyBlueprint").addEventListener("click", async () => {
-    const status = document.getElementById("copyStatus");
-    try {
-      await navigator.clipboard.writeText(getSpecText());
-      status.textContent = "Spec copied.";
-    } catch (error) {
-      status.textContent = getSpecText();
-    }
-  });
-}
-
-renderFilters();
-renderCoverage();
-renderAgents();
-renderGradeMap();
-renderFormats();
-renderBlueprint(activeType);
-bindEvents();
+export { worksheetTypes };
