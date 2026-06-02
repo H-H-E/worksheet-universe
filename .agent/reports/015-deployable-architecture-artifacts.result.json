@@ -1,0 +1,59 @@
+{
+  "task_id": "015-deployable-architecture-artifacts",
+  "status": "passed",
+  "summary": "Captured deployability architecture artifacts for worksheet taxonomy metadata, HTML/TeX plus LaTeX rendering, and deterministic coherent question generation from worksheet JSON.",
+  "files_changed": [
+    ".agent/queue/015-deployable-architecture-artifacts.json",
+    ".agent/reports/015-deployable-architecture-artifacts.md",
+    ".agent/reports/015-deployable-architecture-artifacts.result.json",
+    "docs/architecture/README.md",
+    "docs/architecture/taxonomy-registry.md",
+    "docs/architecture/html-tex-rendering.md",
+    "docs/architecture/deterministic-generators.md"
+  ],
+  "commands_run": [
+    {
+      "command": "node scripts/agent-validate.mjs",
+      "status": "passed",
+      "notes": "Harness validation passed with warnings for ready task path overlaps and prior manual result-state mismatches."
+    },
+    {
+      "command": "node scripts/verify-generators.js",
+      "status": "passed",
+      "notes": "Checked 139 worksheet types and 834 generated items with no failed audits."
+    }
+  ],
+  "acceptance_results": [
+    {
+      "criterion": "Taxonomy artifact documents grade, topic, skill, subskill, standards, difficulty, prerequisite, and coverage fields",
+      "status": "passed",
+      "notes": "docs/architecture/taxonomy-registry.md defines required registry fields, JSON shape, representative coverage examples, and coverage scoring."
+    },
+    {
+      "criterion": "Renderer artifact documents HTML/CSS layout with TeX math islands plus LaTeX export from the same worksheet JSON",
+      "status": "passed",
+      "notes": "docs/architecture/html-tex-rendering.md documents validated worksheet JSON flowing to HTML/CSS, browser print, and LaTeX export."
+    },
+    {
+      "criterion": "Generator artifact documents deterministic coherent question generation from seed, constraints, variables, answers, worked solutions, and verification",
+      "status": "passed",
+      "notes": "docs/architecture/deterministic-generators.md documents seeded generation, constructive variable selection, answer derivation, worked solutions, lineage, and verification layers."
+    },
+    {
+      "criterion": "Artifacts include concrete next implementation paths tied to likely repo directories",
+      "status": "passed",
+      "notes": "Each architecture artifact includes an implementation path with likely future src, tests, fixtures, and docs locations."
+    },
+    {
+      "criterion": "Generator verification still passes",
+      "status": "passed",
+      "notes": "node scripts/verify-generators.js passed for 139 worksheet types and 834 generated items."
+    }
+  ],
+  "remaining_work": [],
+  "risks": [
+    "Current architecture artifacts are docs, not implemented schema modules.",
+    "Real browser smoke is blocked in this host by missing libatk-1.0.so.0, though static HTTP startup returned 200 OK."
+  ],
+  "next_recommended_task": null
+}

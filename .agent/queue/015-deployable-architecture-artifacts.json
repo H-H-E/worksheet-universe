@@ -1,0 +1,27 @@
+{
+  "id": "015-deployable-architecture-artifacts",
+  "title": "Capture deployable architecture artifacts",
+  "branch": "agent/015-deployable-architecture-artifacts",
+  "priority": 15,
+  "status": "pending",
+  "lane": "docs",
+  "allowed_paths": [
+    ".agent/queue",
+    ".agent/reports",
+    "docs"
+  ],
+  "forbidden_paths": [".git", "node_modules", ".env", ".vercel/project.json"],
+  "goal": "Turn the taxonomy, renderer/export, and deterministic-generator subagent outputs into durable implementation artifacts that move Worksheet Universe toward a deployable JSON-first worksheet compiler.",
+  "context": "The public static app is pushed to GitHub and Vercel-ready. The next deployability gap is preserving the plans for standards-aligned worksheet type metadata, mixed HTML/TeX rendering, LaTeX export, and coherent deterministic generation so future implementation can proceed from repo artifacts instead of chat context.",
+  "acceptance": [
+    "Taxonomy artifact documents grade, topic, skill, subskill, standards, difficulty, prerequisite, and coverage fields",
+    "Renderer artifact documents HTML/CSS layout with TeX math islands plus LaTeX export from the same worksheet JSON",
+    "Generator artifact documents deterministic coherent question generation from seed, constraints, variables, answers, worked solutions, and verification",
+    "Artifacts include concrete next implementation paths tied to likely repo directories",
+    "Generator verification still passes"
+  ],
+  "commands": ["node scripts/agent-validate.mjs", "node scripts/verify-generators.js"],
+  "max_attempts": 1,
+  "depends_on": [],
+  "notes": "Do not add npm dependencies or implement PDF compilation. Keep JSON as the source of truth."
+}
