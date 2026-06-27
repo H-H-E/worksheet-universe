@@ -49,13 +49,13 @@ export function WorksheetCommandCenter() {
   const fallback = useMemo(() => defaultCommandCenterIntent(worksheetTypes), []);
   const parsedPrompt = useMemo(() => parseWorksheetPrompt(intent.prompt, worksheetTypes), [intent.prompt]);
   const visibleTypes = useMemo(() => {
-    const filtered = filterWorksheetTypes(worksheetTypes, {
+    return filterWorksheetTypes(worksheetTypes, {
+      query: intent.skillQuery,
       exactGrade: intent.exactGrade,
       strand: intent.strand,
       format: intent.format
     });
-    return filtered.length > 0 ? filtered : worksheetTypes;
-  }, [intent.exactGrade, intent.format, intent.strand]);
+  }, [intent.exactGrade, intent.format, intent.skillQuery, intent.strand]);
   const activeType = resolveActiveType(intent, parsedPrompt.worksheetTypeId, visibleTypes);
   const activeFormat = activeType.formats.includes(intent.format) ? intent.format : activeType.formats[0];
   const worksheet = useMemo(
@@ -166,8 +166,14 @@ export function WorksheetCommandCenter() {
     updateIntent({ activePanel: panel });
   }
 
+  function setMobileWorkflowStep(step: string) {
+    setMobileStep(step);
+    if (step === "export") setActivePanel("export");
+    if (step === "review" && intent.activePanel === "export") setActivePanel("trust");
+  }
+
   return (
-    <div className="command-center-shell">
+    <div className="command-center-shell relative isolate bg-muted/20">
       <a className="skip-link" href="#command-workspace">Skip to worksheet workspace</a>
       <p className="sr-only" aria-live="polite">{copyStatus}</p>
       <header className="command-topbar no-print">
@@ -175,14 +181,13 @@ export function WorksheetCommandCenter() {
           <div className="brand-mark" aria-hidden="true">WU</div>
           <div>
             <h1>Worksheet Universe</h1>
-            <p>JSON-first worksheet command center</p>
+            <p>Make, inspect, print</p>
           </div>
         </div>
-        <nav className="primary-nav" aria-label="Primary">
-          <a href="#command-workspace">Generate</a>
-          <a href="#command-workspace">Preview</a>
-          <a href="#desktop-trust-panel">Review</a>
-        </nav>
+        <div className="topbar-current no-print" aria-label="Current worksheet">
+          <span>{activeType.title}</span>
+          <small>{intent.itemCount} questions, {intent.pageSize.toUpperCase()}, seed {intent.seed}</small>
+        </div>
         <div className="topbar-actions">
           <Badge variant={audit.ok ? "success" : "warning"}>{audit.ok ? "Audit passed" : "Audit review"}</Badge>
           <Button type="button" variant="outline" size="sm" onClick={makeAnother}>
@@ -195,7 +200,7 @@ export function WorksheetCommandCenter() {
           </Button>
           <Sheet>
             <SheetTrigger asChild>
-              <Button type="button" variant="outline" size="icon" className="lg:hidden" aria-label="Open command menu">
+              <Button type="button" variant="outline" size="icon" className="mobile-menu-button lg:hidden" aria-label="Open command menu">
                 <Menu aria-hidden="true" />
               </Button>
             </SheetTrigger>
@@ -223,10 +228,10 @@ export function WorksheetCommandCenter() {
         </div>
       </header>
 
-      <main id="command-workspace">
-        <div className="command-mobile lg:hidden">
+      <main id="command-workspace" className="relative">
+        <div className="command-mobile lg:hidden rounded-[1rem] border border-border/80 bg-background/95 p-1 shadow-[0_16px_36px_-30px_rgba(0,0,0,0.4)]">
           <PromptBar idPrefix="mobile" intent={intent} parsedPrompt={parsedPrompt} updateIntent={updateIntent} applyPrompt={applyPrompt} />
-          <Tabs value={mobileStep} onValueChange={setMobileStep}>
+          <Tabs value={mobileStep} onValueChange={setMobileWorkflowStep}>
             <TabsList className="mobile-tabs">
               <TabsTrigger value="setup">Setup</TabsTrigger>
               <TabsTrigger value="preview">Preview</TabsTrigger>
@@ -245,7 +250,7 @@ export function WorksheetCommandCenter() {
               />
             </TabsContent>
             <TabsContent value="preview">
-              <div>
+              <div className="rounded-[0.85rem] border border-border/70 bg-card/60 p-2 shadow-[0_10px_24px_-24px_rgba(0,0,0,0.35)]">
                 <WorksheetPreview
                   worksheet={worksheet}
                   pageSize={intent.pageSize}
@@ -282,7 +287,7 @@ export function WorksheetCommandCenter() {
                 worksheet={worksheet}
                 audit={audit}
                 checks={checks}
-                activePanel="export"
+                activePanel={intent.activePanel}
                 copyStatus={copyStatus}
                 setActivePanel={setActivePanel}
                 checkAll={checkAll}
@@ -296,58 +301,82 @@ export function WorksheetCommandCenter() {
           </Tabs>
         </div>
 
-        <div className="command-desktop hidden lg:grid">
-          <aside className="command-sidebar no-print">
-            <PromptBar idPrefix="desktop" intent={intent} parsedPrompt={parsedPrompt} updateIntent={updateIntent} applyPrompt={applyPrompt} />
-            <SetupPanel
-              idPrefix="desktop"
-              intent={intent}
-              activeType={activeType}
-              visibleTypes={visibleTypes}
-              updateIntent={updateIntent}
-              applyPreset={applyPreset}
-              resetToDefault={resetToDefault}
-            />
-          </aside>
-
-          <section className="command-preview-column" aria-label="Live worksheet preview">
-            <div className="preview-heading no-print">
-              <div>
-                <p className="eyebrow">Live preview</p>
-                <h2>{worksheet.title}</h2>
+        <div className="command-desktop-frame hidden lg:block rounded-[1.8rem] border border-border/65 bg-muted/35 p-2 shadow-[0_24px_58px_-40px_rgba(0,0,0,0.38)]">
+          <div className="command-desktop hidden lg:grid">
+            <section className="command-control-deck no-print rounded-[1.25rem] border border-border/55 bg-card/90 shadow-[0_10px_28px_-24px_rgba(0,0,0,0.3)]">
+              <PromptBar idPrefix="desktop" intent={intent} parsedPrompt={parsedPrompt} updateIntent={updateIntent} applyPrompt={applyPrompt} />
+              <div className="workflow-panel">
+                <div className="workflow-heading">
+                  <p className="eyebrow">Workflow</p>
+                  <strong>{audit.ok ? "Ready to print" : "Review before export"}</strong>
+                </div>
+                <ol className="workflow-rail" aria-label="Workflow status">
+                  <WorkflowStep label="Teacher intent" value={intent.prompt.trim() ? "Parsed" : "Ready"} />
+                  <WorkflowStep label="Setup" value={intent.exactGrade ? `Grade ${intent.exactGrade}` : "Any grade"} />
+                  <WorkflowStep label="Preview" value={`${worksheet.answerKey.length} items`} />
+                  <WorkflowStep label="Review" value={audit.ok ? "Verified" : "Needs review"} />
+                  <WorkflowStep label="Export" value="Student print" />
+                </ol>
+                <div className="flow-summary" aria-label="Current draft summary">
+                  <SummaryItem label="Skill" value={activeType.title} />
+                  <SummaryItem label="Format" value={activeFormat.replaceAll("-", " ")} />
+                  <SummaryItem label="Grade" value={intent.exactGrade || "Any"} />
+                  <SummaryItem label="Status" value={audit.ok ? "Verified" : "Needs review"} />
+                </div>
               </div>
-              <Badge variant="outline">{intent.pageSize.toUpperCase()} / Seed {intent.seed}</Badge>
-            </div>
-            <WorksheetPreview
-              worksheet={worksheet}
-              pageSize={intent.pageSize}
-              answers={answers}
-              checks={checks}
-              lockedQuestionIds={lockedQuestionIds}
-              setAnswers={setAnswers}
-              setChecks={setChecks}
-              toggleQuestionLock={toggleQuestionLock}
-              requestNewVersion={makeAnother}
-            />
-          </section>
+            </section>
 
-          <aside className="command-inspector no-print">
-            <TrustPanel
-              idPrefix="desktop"
-              worksheet={worksheet}
-              audit={audit}
-              checks={checks}
-              activePanel={intent.activePanel}
-              copyStatus={isPending ? "Updating URL..." : copyStatus}
-              setActivePanel={setActivePanel}
-              checkAll={checkAll}
-              printStudent={() => printWithMode("student")}
-              printAnswerKey={() => printWithMode("answer-key")}
-              printAll={() => printWithMode("all")}
-              copyJson={copyJson}
-              makeAnother={makeAnother}
-            />
-          </aside>
+            <aside className="command-sidebar no-print rounded-[1.15rem] border border-border/55 bg-card/95 shadow-[0_12px_30px_-30px_rgba(0,0,0,0.3)]">
+              <SetupPanel
+                idPrefix="desktop"
+                intent={intent}
+                activeType={activeType}
+                visibleTypes={visibleTypes}
+                updateIntent={updateIntent}
+                applyPreset={applyPreset}
+                resetToDefault={resetToDefault}
+              />
+            </aside>
+
+            <section className="command-preview-column rounded-[1.2rem] border border-border/60 bg-background/95 shadow-[0_14px_36px_-30px_rgba(0,0,0,0.34)]" aria-label="Live worksheet preview">
+              <div className="preview-heading no-print">
+                <div>
+                  <p className="eyebrow">Preview</p>
+                  <h2>Student worksheet</h2>
+                </div>
+                <Badge variant="outline">{worksheet.title}</Badge>
+              </div>
+              <WorksheetPreview
+                worksheet={worksheet}
+                pageSize={intent.pageSize}
+                answers={answers}
+                checks={checks}
+                lockedQuestionIds={lockedQuestionIds}
+                setAnswers={setAnswers}
+                setChecks={setChecks}
+                toggleQuestionLock={toggleQuestionLock}
+                requestNewVersion={makeAnother}
+              />
+            </section>
+
+            <aside className="command-inspector no-print rounded-[1.2rem] border border-border/55 bg-card/95 shadow-[0_12px_30px_-30px_rgba(0,0,0,0.3)]">
+              <TrustPanel
+                idPrefix="desktop"
+                worksheet={worksheet}
+                audit={audit}
+                checks={checks}
+                activePanel={intent.activePanel}
+                copyStatus={isPending ? "Updating URL..." : copyStatus}
+                setActivePanel={setActivePanel}
+                checkAll={checkAll}
+                printStudent={() => printWithMode("student")}
+                printAnswerKey={() => printWithMode("answer-key")}
+                printAll={() => printWithMode("all")}
+                copyJson={copyJson}
+                makeAnother={makeAnother}
+              />
+            </aside>
+            </div>
         </div>
       </main>
 
@@ -362,6 +391,24 @@ export function WorksheetCommandCenter() {
         </Button>
       </div>
     </div>
+  );
+}
+
+function SummaryItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="summary-item">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function WorkflowStep({ label, value }: { label: string; value: string }) {
+  return (
+    <li>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </li>
   );
 }
 

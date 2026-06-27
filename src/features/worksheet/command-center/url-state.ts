@@ -18,6 +18,7 @@ export function defaultCommandCenterIntent(types: readonly WorksheetType[] = wor
 
   return {
     prompt: "Make a Grade 5 fractions worksheet with visual models, 8 questions, medium difficulty, with answers.",
+    skillQuery: "",
     exactGrade: type.grades.includes("5") ? "5" : type.grades[0],
     strand: type.strand,
     typeId: type.id,
@@ -38,6 +39,7 @@ export function intentFromSearchParams(searchParams: URLSearchParams, types: rea
 
   return normalizeIntent({
     prompt: searchParams.get("p") || fallback.prompt,
+    skillQuery: searchParams.get("skill") || fallback.skillQuery,
     exactGrade: safeGrade(searchParams.get("grade"), activeType) || fallback.exactGrade,
     strand: safeStrand(searchParams.get("strand")) || fallback.strand,
     typeId,
@@ -53,6 +55,7 @@ export function intentFromSearchParams(searchParams: URLSearchParams, types: rea
 export function intentToSearchParams(intent: CommandCenterIntent, fallback = defaultCommandCenterIntent()) {
   const params = new URLSearchParams();
   setIfChanged(params, "p", intent.prompt, fallback.prompt);
+  setIfChanged(params, "skill", intent.skillQuery, fallback.skillQuery);
   setIfChanged(params, "grade", intent.exactGrade, fallback.exactGrade);
   setIfChanged(params, "strand", intent.strand, fallback.strand);
   setIfChanged(params, "type", intent.typeId, fallback.typeId);
@@ -87,6 +90,7 @@ export function normalizeIntent(intent: CommandCenterIntent, types: readonly Wor
   return {
     ...intent,
     prompt: intent.prompt.trimStart(),
+    skillQuery: intent.skillQuery.trimStart(),
     exactGrade: intent.exactGrade && activeType.grades.includes(intent.exactGrade) ? intent.exactGrade : activeType.grades[0] || fallback.exactGrade,
     strand: intent.strand && activeType.strand === intent.strand ? intent.strand : activeType.strand,
     typeId: activeType.id,

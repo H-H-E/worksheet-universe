@@ -1,0 +1,53 @@
+{
+  "id": "019-feature-story-audit",
+  "title": "Audit all app features as user stories",
+  "branch": "agent/019-feature-story-audit",
+  "priority": 19,
+  "status": "passed",
+  "lane": "review",
+  "allowed_paths": [
+    ".agent/queue",
+    ".agent/reports",
+    "docs",
+    "output/playwright",
+    "src",
+    "tests",
+    "README.md",
+    "package.json",
+    "package-lock.json",
+    "playwright.config.ts",
+    "playwright.config.js"
+  ],
+  "forbidden_paths": [
+    ".git",
+    "node_modules",
+    ".env",
+    ".vercel/project.json",
+    ".next",
+    "out"
+  ],
+  "goal": "Inventory every user-facing feature in the Worksheet Universe app, record each as a user story with expected behavior in one canonical spreadsheet, test each story, document errors, fix logistical or UX errors, and retest the stories after fixes.",
+  "context": "The user requested a full feature/user-story audit followed by browser behavior testing, error documentation, UX/logistics fixes, and post-fix retesting. Worksheet JSON remains the canonical source of truth.",
+  "acceptance": [
+    "A single canonical spreadsheet tracks each feature, user story, expected behavior, status, test evidence, defects, fixes, and retest result",
+    "Every user-facing feature discoverable from the code is represented by at least one user story",
+    "Automated checks and browser behavior tests are run against the recorded stories",
+    "Logistical or UX errors found during testing are documented and fixed where safe within scope",
+    "Every fixed behavior is retested and the spreadsheet/report reflect the final status"
+  ],
+  "commands": [
+    "node scripts/agent-validate.mjs",
+    "node tests/fixtures/validate-fixtures.mjs",
+    "npm run lint",
+    "npm run typecheck",
+    "npm run test",
+    "npm run test:generators",
+    "npm run build"
+  ],
+  "max_attempts": 2,
+  "depends_on": [
+    "017-next-command-center-frontend",
+    "018-command-center-usability-redesign"
+  ],
+  "notes": "Do not add auth, accounts, databases, LMS integrations, OCR, complex PDF generation, or non-JSON worksheet content paths."
+}

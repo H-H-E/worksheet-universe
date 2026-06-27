@@ -1,0 +1,90 @@
+{
+  "task_id": "018-command-center-usability-redesign",
+  "status": "passed",
+  "summary": "Used the canonical user-story CSV to refine the worksheet command center into a clearer teacher-intent, setup, preview, review, and export workflow while preserving the JSON-first compiler and deterministic generation.",
+  "files_changed": [
+    ".agent/queue/018-command-center-usability-redesign.json",
+    ".agent/reports/018-command-center-usability-redesign.md",
+    ".agent/reports/018-command-center-usability-redesign.result.json",
+    "src/app/globals.css",
+    "src/features/worksheet/command-center/WorksheetCommandCenter.tsx",
+    "src/features/worksheet/command-center/setup-panel.tsx",
+    "src/features/worksheet/command-center/trust-panel.tsx",
+    "src/features/worksheet/command-center/types.ts",
+    "src/features/worksheet/command-center/url-state.ts",
+    "src/features/worksheet/command-center/worksheet-preview.tsx",
+    "tests/frontend/worksheet-console.test.ts"
+  ],
+  "commands_run": [
+    {
+      "command": "node scripts/agent-validate.mjs",
+      "status": "passed",
+      "notes": "Passed with existing unrelated queue/state warnings."
+    },
+    {
+      "command": "npm run lint",
+      "status": "passed",
+      "notes": "ESLint passed with zero warnings."
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "passed",
+      "notes": "TypeScript no-emit check passed."
+    },
+    {
+      "command": "npm run test",
+      "status": "passed",
+      "notes": "Frontend/helper test file passed, including source-level guards for the story-driven UI changes."
+    },
+    {
+      "command": "npm run test:generators",
+      "status": "passed",
+      "notes": "Checked 139 worksheet types and 834 generated items; failed list was empty."
+    },
+    {
+      "command": "npm run build",
+      "status": "passed",
+      "notes": "Next webpack build passed and prerendered route / as static content."
+    }
+  ],
+  "acceptance_results": [
+    {
+      "criterion": "The desktop UI has a clear primary flow: teacher intent, tuning controls, live worksheet preview, review/export actions",
+      "status": "passed",
+      "notes": "Added a workflow rail and retained the current draft summary in the desktop control deck."
+    },
+    {
+      "criterion": "The preview is visually cleaner and resembles the final worksheet before digital checking controls are expanded",
+      "status": "passed",
+      "notes": "Moved per-question digital checks behind native details disclosures and updated PREVIEW-003 in the canonical CSV."
+    },
+    {
+      "criterion": "Generator selection is searchable and less cognitively heavy than the previous full control wall",
+      "status": "passed",
+      "notes": "Search, selected-generator summary, no-match state, and capped visible generator results are present."
+    },
+    {
+      "criterion": "Review and export actions are visible without forcing users to discover a hidden tab",
+      "status": "passed",
+      "notes": "Primary print/copy/make-another actions remain above trust-panel details, with Print student copy promoted."
+    },
+    {
+      "criterion": "Mobile keeps a step workflow with concise labels and usable action placement",
+      "status": "passed",
+      "notes": "Mobile setup/preview/review/export tabs remain; mobile export panel state is synchronized with TrustPanel tabs."
+    },
+    {
+      "criterion": "Worksheet JSON schema and deterministic generation remain unchanged",
+      "status": "passed",
+      "notes": "No schema or generator behavior changes; generator verification passed."
+    },
+    {
+      "criterion": "Frontend tests and required checks pass",
+      "status": "passed",
+      "notes": "Harness validation, lint, typecheck, tests, generator verification, and build passed."
+    }
+  ],
+  "remaining_work": [],
+  "risks": [],
+  "next_recommended_task": null
+}

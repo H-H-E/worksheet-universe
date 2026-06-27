@@ -65,10 +65,17 @@ export function WorksheetPreview({
             <h3 id={`${section.id}-title`} className="section-title">{section.title}</h3>
             <ol className={cn("worksheet-grid", `format-${worksheet.metadata.format}`)}>
               {section.questions.map((question) => (
-                <li key={question.id} className={cn("worksheet-item", statusRing(checks[question.id]?.status))}>
+                <li key={question.id} className={cn("worksheet-item group/item", statusRing(checks[question.id]?.status))}>
                   <div className="question-title-row">
                     <p className="question-prompt">{question.prompt}</p>
-                    <div className="question-actions no-print">
+                    <div
+                      className={cn(
+                        "question-actions no-print opacity-0 translate-y-0.5 blur-sm pointer-events-none transition-[opacity,transform,filter] duration-150 ease-out",
+                        "motion-safe:group-hover/item:opacity-100 motion-safe:group-hover/item:translate-y-0 motion-safe:group-hover/item:blur-0 motion-safe:group-hover/item:pointer-events-auto",
+                        "motion-safe:group-focus-within/item:opacity-100 motion-safe:group-focus-within/item:translate-y-0 motion-safe:group-focus-within/item:blur-0 motion-safe:group-focus-within/item:pointer-events-auto",
+                        "motion-reduce:transition-none"
+                      )}
+                    >
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
@@ -76,17 +83,39 @@ export function WorksheetPreview({
                             variant={lockedQuestionIds.includes(question.id) ? "secondary" : "ghost"}
                             size="icon"
                             aria-label={lockedQuestionIds.includes(question.id) ? `Unlock ${question.id}` : `Lock ${question.id}`}
+                            className="group/context-lock"
                             onClick={() => toggleQuestionLock(question.id)}
                           >
-                            <LockKeyhole aria-hidden="true" />
+                            <LockKeyhole
+                              aria-hidden="true"
+                              className={cn(
+                                "size-4 transition-[transform,filter] duration-150 ease-out",
+                                "motion-safe:group-hover/context-lock:scale-110 motion-safe:group-hover/context-lock:-translate-y-0.5 motion-safe:group-hover/context-lock:blur-sm",
+                                "motion-reduce:transition-none"
+                              )}
+                            />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>{lockedQuestionIds.includes(question.id) ? "Unlock question" : "Lock question"}</TooltipContent>
                       </Tooltip>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button type="button" variant="ghost" size="icon" aria-label={`Make another version of ${question.id}`} onClick={requestNewVersion}>
-                            <RefreshCcw aria-hidden="true" />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Make another version of ${question.id}`}
+                            className="group/context-refresh"
+                            onClick={requestNewVersion}
+                          >
+                            <RefreshCcw
+                              aria-hidden="true"
+                              className={cn(
+                                "size-4 transition-[transform,filter] duration-150 ease-out",
+                                "motion-safe:group-hover/context-refresh:scale-110 motion-safe:group-hover/context-refresh:translate-y-[-1px] motion-safe:group-hover/context-refresh:rotate-6",
+                                "motion-reduce:transition-none"
+                              )}
+                            />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>Make another version</TooltipContent>
@@ -96,26 +125,29 @@ export function WorksheetPreview({
                   <div className="question-content">
                     {question.content.map((block, index) => renderBlock(block, `${question.id}-${index}`))}
                   </div>
-                  <div className="answer-checker no-print">
-                    <div className="answer-input">
-                      <Label htmlFor={`answer-${question.id}`}>Answer {question.id.replace("q", "")}</Label>
-                      <Input
-                        id={`answer-${question.id}`}
-                        name={`answer-${question.id}`}
-                        autoComplete="off"
-                        value={answers[question.id] || ""}
-                        onChange={(event) => setAnswers((current) => ({ ...current, [question.id]: event.target.value }))}
-                        aria-describedby={`feedback-${question.id}`}
-                      />
+                  <details className="answer-checker no-print">
+                    <summary>Digital answer check</summary>
+                    <div className="answer-checker-body">
+                      <div className="answer-input">
+                        <Label htmlFor={`answer-${question.id}`}>Answer {question.id.replace("q", "")}</Label>
+                        <Input
+                          id={`answer-${question.id}`}
+                          name={`answer-${question.id}`}
+                          autoComplete="off"
+                          value={answers[question.id] || ""}
+                          onChange={(event) => setAnswers((current) => ({ ...current, [question.id]: event.target.value }))}
+                          aria-describedby={`feedback-${question.id}`}
+                        />
+                      </div>
+                      <Button type="button" variant="outline" size="sm" onClick={() => checkQuestion(question)}>
+                        <CheckCircle2 aria-hidden="true" />
+                        Check
+                      </Button>
+                      <p id={`feedback-${question.id}`} className={cn("feedback", feedbackTone(checks[question.id]?.status))} aria-live="polite">
+                        {checks[question.id]?.notes || "Ready to check."}
+                      </p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" onClick={() => checkQuestion(question)}>
-                      <CheckCircle2 aria-hidden="true" />
-                      Check
-                    </Button>
-                    <p id={`feedback-${question.id}`} className={cn("feedback", feedbackTone(checks[question.id]?.status))} aria-live="polite">
-                      {checks[question.id]?.notes || "Ready to check."}
-                    </p>
-                  </div>
+                  </details>
                 </li>
               ))}
             </ol>

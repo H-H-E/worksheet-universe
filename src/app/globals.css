@@ -57,6 +57,8 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 [id] {
@@ -66,13 +68,10 @@ html {
 body {
   min-height: 100vh;
   overflow-x: hidden;
-  background:
-    linear-gradient(90deg, color-mix(in oklch, var(--border) 38%, transparent) 1px, transparent 1px),
-    linear-gradient(color-mix(in oklch, var(--border) 34%, transparent) 1px, transparent 1px),
-    var(--background);
-  background-size: 42px 42px, 42px 42px, auto;
+  background: linear-gradient(180deg, oklch(0.99 0.006 105), var(--background) 22rem);
   color: var(--foreground);
   font-family: var(--font-sans);
+  text-wrap: pretty;
 }
 
 button,
@@ -90,6 +89,11 @@ textarea,
 [role="button"] {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+.command-center-shell button {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
 }
 
 textarea {
@@ -133,7 +137,7 @@ textarea {
   top: 0;
   z-index: 40;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto;
   gap: 1rem;
   align-items: center;
   border-bottom: 1px solid var(--border);
@@ -144,7 +148,7 @@ textarea {
 
 .brand-lockup,
 .topbar-actions,
-.primary-nav,
+.topbar-current,
 .question-title-row,
 .question-actions {
   display: flex;
@@ -182,26 +186,39 @@ textarea {
   font-size: 0.78rem;
 }
 
-.primary-nav {
-  display: none;
-  gap: 0.25rem;
+.topbar-current {
+  min-width: 0;
   justify-content: center;
-}
-
-.primary-nav a {
-  border-radius: var(--radius);
+  gap: 0.6rem;
   color: var(--muted-foreground);
-  font-size: 0.875rem;
-  font-weight: 650;
-  padding: 0.55rem 0.75rem;
-  text-decoration: none;
+  font-size: 0.8rem;
 }
 
-.primary-nav a:focus-visible,
-.primary-nav a:hover {
-  background: var(--secondary);
-  color: var(--secondary-foreground);
-  outline: none;
+.topbar-current span {
+  min-width: 0;
+  max-width: 34rem;
+  overflow: hidden;
+  color: var(--foreground);
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+h1,
+h2,
+h3,
+.section-title,
+.brand-lockup h1,
+.preview-heading h2,
+.panel-heading h2,
+.worksheet-header h2 {
+  text-wrap: balance;
+}
+
+.topbar-current small {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
 }
 
 .topbar-actions {
@@ -236,9 +253,25 @@ textarea {
 .command-desktop {
   width: min(1760px, calc(100% - 2rem));
   margin: 0 auto;
+  grid-template-areas:
+    "control control control"
+    "setup preview review";
   grid-template-columns: 350px minmax(0, 1fr) 390px;
-  gap: 1rem;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.9rem;
   padding: 1rem 0 2rem;
+}
+
+.command-desktop-frame,
+.command-desktop {
+  display: none;
+}
+
+.command-control-deck {
+  display: grid;
+  grid-area: control;
+  grid-template-columns: minmax(0, 1fr) 520px;
+  gap: 0.9rem;
 }
 
 .command-sidebar,
@@ -254,7 +287,16 @@ textarea {
   padding-right: 0.1rem;
 }
 
+.command-sidebar {
+  grid-area: setup;
+}
+
+.command-inspector {
+  grid-area: review;
+}
+
 .command-preview-column {
+  grid-area: preview;
   min-width: 0;
 }
 
@@ -296,7 +338,136 @@ textarea {
   border-radius: var(--radius);
   background: color-mix(in oklch, var(--card) 95%, white);
   padding: 1rem;
-  box-shadow: 0 1px 2px color-mix(in oklch, var(--foreground) 10%, transparent);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--foreground) 7%, transparent);
+}
+
+.command-control-deck .prompt-bar {
+  align-content: start;
+  gap: 0.65rem;
+}
+
+.workflow-panel {
+  display: grid;
+  gap: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in oklch, var(--card) 92%, white);
+  padding: 0.75rem;
+}
+
+.workflow-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.workflow-heading strong {
+  color: var(--foreground);
+  font-size: 0.86rem;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.workflow-rail {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: workflow-step;
+}
+
+.workflow-rail li {
+  position: relative;
+  min-width: 0;
+  padding-top: 1.35rem;
+}
+
+.workflow-rail li::before {
+  counter-increment: workflow-step;
+  content: counter(workflow-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  width: 1rem;
+  height: 1rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.workflow-rail li::after {
+  content: "";
+  position: absolute;
+  top: 0.47rem;
+  left: 1.25rem;
+  right: 0.2rem;
+  height: 1px;
+  background: var(--border);
+}
+
+.workflow-rail li:last-child::after {
+  display: none;
+}
+
+.workflow-rail span,
+.workflow-rail strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-rail span {
+  color: var(--muted-foreground);
+  font-size: 0.66rem;
+  font-weight: 760;
+}
+
+.workflow-rail strong {
+  margin-top: 0.08rem;
+  font-size: 0.72rem;
+  font-weight: 760;
+}
+
+.flow-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  border-radius: var(--radius);
+  background: color-mix(in oklch, var(--secondary) 34%, white);
+  padding: 0.65rem;
+}
+
+.summary-item {
+  min-width: 0;
+  border-radius: calc(var(--radius) - 2px);
+  background: color-mix(in oklch, var(--card) 88%, transparent);
+  padding: 0.55rem 0.65rem;
+}
+
+.summary-item span {
+  display: block;
+  color: var(--muted-foreground);
+  font-size: 0.68rem;
+  font-weight: 760;
+  text-transform: uppercase;
+}
+
+.summary-item strong {
+  display: block;
+  overflow: hidden;
+  font-size: 0.86rem;
+  font-weight: 760;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+  white-space: nowrap;
 }
 
 .prompt-row {
@@ -332,14 +503,15 @@ textarea {
 
 .preset-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.4rem;
 }
 
 .preset-button {
   height: auto;
-  min-height: 3.5rem;
-  flex-direction: column;
+  min-height: 2.75rem;
+  justify-content: space-between;
+  flex-direction: row;
   gap: 0.2rem;
   white-space: normal;
 }
@@ -360,8 +532,35 @@ textarea {
 
 .grade-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.35rem;
+}
+
+.selected-generator {
+  display: grid;
+  gap: 0.18rem;
+  border: 1px solid color-mix(in oklch, var(--ring) 40%, var(--border));
+  border-radius: var(--radius);
+  background: color-mix(in oklch, var(--secondary) 50%, white);
+  padding: 0.7rem;
+}
+
+.selected-generator span {
+  color: var(--muted-foreground);
+  font-size: 0.68rem;
+  font-weight: 760;
+  text-transform: uppercase;
+}
+
+.selected-generator strong {
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
+.selected-generator small {
+  color: var(--muted-foreground);
+  font-size: 0.76rem;
+  line-height: 1.35;
 }
 
 .generator-list {
@@ -376,7 +575,7 @@ textarea {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--background);
-  padding: 0.62rem 0.7rem;
+  padding: 0.55rem 0.65rem;
   text-align: left;
   transition: border-color 160ms ease, background-color 160ms ease;
 }
@@ -393,6 +592,15 @@ textarea {
   font-size: 0.88rem;
   font-weight: 720;
   line-height: 1.25;
+}
+
+.empty-generator-state {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted-foreground);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  padding: 0.7rem;
 }
 
 .result-count {
@@ -417,6 +625,36 @@ textarea {
   grid-template-columns: 0.8fr 0.8fr 1fr;
 }
 
+.fine-tuning-panel {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in oklch, var(--background) 72%, var(--card));
+}
+
+.fine-tuning-panel summary {
+  display: flex;
+  min-height: 2.5rem;
+  cursor: pointer;
+  align-items: center;
+  padding: 0 0.75rem;
+  color: var(--muted-foreground);
+  font-size: 0.82rem;
+  font-weight: 760;
+}
+
+.fine-tuning-panel summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.fine-tuning-fields {
+  display: grid;
+  gap: 0.7rem;
+  border-top: 1px solid var(--border);
+  padding: 0.75rem;
+}
+
 .preview-stack {
   display: grid;
   justify-items: center;
@@ -424,13 +662,13 @@ textarea {
 }
 
 .worksheet-page {
-  width: min(100%, 9.4in);
+  width: min(100%, 8.75in);
   min-height: 11in;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: oklch(0.998 0.002 105);
-  padding: 0.62in;
-  box-shadow: 0 18px 45px color-mix(in oklch, var(--foreground) 14%, transparent);
+  padding: 0.55in;
+  box-shadow: 0 10px 30px color-mix(in oklch, var(--foreground) 10%, transparent);
 }
 
 .page-a4 {
@@ -537,6 +775,21 @@ textarea {
 
 .question-actions {
   gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.question-actions button {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+}
+
+.worksheet-item:hover .question-actions,
+.worksheet-item:focus-within .question-actions {
+  opacity: 1;
+  pointer-events: auto;
+  filter: none;
+  transform: translateY(0);
 }
 
 .question-content {
@@ -646,12 +899,34 @@ textarea {
 }
 
 .answer-checker {
+  border-top: 1px solid var(--border);
+  padding-top: 0.65rem;
+}
+
+.answer-checker summary {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  width: fit-content;
+  cursor: pointer;
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0 0.55rem;
+}
+
+.answer-checker summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.answer-checker-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.55rem;
   align-items: end;
-  border-top: 1px solid var(--border);
-  padding-top: 0.65rem;
+  padding-top: 0.55rem;
 }
 
 .answer-input {
@@ -708,7 +983,6 @@ textarea {
   display: block;
   margin-top: 0.2rem;
   font-size: 1.2rem;
-  font-variant-numeric: tabular-nums;
 }
 
 .metric-good {
@@ -756,10 +1030,15 @@ textarea {
   gap: 0.55rem;
 }
 
+.primary-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .export-button {
   height: auto;
   justify-content: start;
-  padding: 0.75rem;
+  align-items: start;
+  padding: 0.65rem;
   white-space: normal;
 }
 
@@ -769,10 +1048,28 @@ textarea {
   text-align: left;
 }
 
+.primary-export-button {
+  box-shadow: 0 10px 24px color-mix(in oklch, var(--primary) 22%, transparent);
+}
+
+.primary-export-button small {
+  color: color-mix(in oklch, var(--primary-foreground) 82%, transparent);
+}
+
 .status-line {
   min-height: 1.25rem;
   color: var(--muted-foreground);
   font-size: 0.8rem;
+}
+
+.use-notes {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  padding: 0.75rem;
 }
 
 .json-panel {
@@ -814,8 +1111,15 @@ textarea {
 }
 
 .student-fields,
+.prompt-chips,
 .answer-key-print-list,
-.worksheet-data-table {
+.worksheet-data-table,
+.topbar-current small,
+.result-count,
+.summary-item strong,
+.quality-item span,
+.metric-card strong,
+input[type="number"] {
   font-variant-numeric: tabular-nums;
 }
 
@@ -832,11 +1136,7 @@ textarea {
 
 @media (min-width: 720px) {
   .command-topbar {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-  }
-
-  .primary-nav {
-    display: flex;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto;
   }
 
   .topbar-actions > .inline-flex:not(:last-child),
@@ -850,9 +1150,33 @@ textarea {
   }
 }
 
+@media (min-width: 1024px) {
+  .command-mobile,
+  .mobile-action-bar,
+  .mobile-menu-button {
+    display: none !important;
+  }
+
+  .command-desktop-frame {
+    display: block;
+  }
+
+  .command-desktop {
+    display: grid;
+  }
+}
+
+@media (max-width: 1023px) {
+  .command-desktop-frame,
+  .command-desktop {
+    display: none !important;
+  }
+}
+
 @media (max-width: 719px) {
   .brand-lockup p,
-  .topbar-actions > .inline-flex {
+  .topbar-current,
+  .topbar-actions > .inline-flex:not(.mobile-menu-button) {
     display: none;
   }
 
@@ -862,10 +1186,13 @@ textarea {
   }
 
   .worksheet-header,
-  .question-title-row,
-  .answer-checker {
+  .question-title-row {
     grid-template-columns: 1fr;
     display: grid;
+  }
+
+  .answer-checker-body {
+    grid-template-columns: 1fr;
   }
 
   .student-fields,
@@ -905,6 +1232,7 @@ textarea {
   }
 
   .command-center-shell,
+  .command-desktop-frame,
   .command-desktop,
   .command-preview-column,
   .preview-stack {
@@ -912,6 +1240,12 @@ textarea {
     width: 100%;
     margin: 0;
     padding: 0;
+  }
+
+  .command-desktop-frame {
+    border: 0;
+    background: white;
+    box-shadow: none;
   }
 
   .worksheet-page {

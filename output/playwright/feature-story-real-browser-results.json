@@ -1,0 +1,114 @@
+{
+  "generatedAt": "2026-06-26T21:28:12.682Z",
+  "url": "http://127.0.0.1:4173",
+  "results": [
+    {
+      "id": "APP-001",
+      "status": "passed",
+      "evidence": "Real Chromium desktop rendered root command center",
+      "details": ""
+    },
+    {
+      "id": "APP-003",
+      "status": "passed",
+      "evidence": "Real Chromium desktop rendered current draft summary",
+      "details": "Fraction Models and Manipulatives\n8 questions, LETTER, seed 42"
+    },
+    {
+      "id": "APP-A11Y-001",
+      "status": "passed",
+      "evidence": "Skip link targets command workspace",
+      "details": ""
+    },
+    {
+      "id": "UX-RESPONSIVE-001",
+      "status": "passed",
+      "evidence": "Desktop viewport shows only desktop command layout",
+      "details": ""
+    },
+    {
+      "id": "SETUP-002",
+      "status": "passed",
+      "evidence": "Incompatible desktop filters show explicit no-match empty state",
+      "details": "Showing 0 of 0"
+    },
+    {
+      "id": "PROMPT-002",
+      "status": "passed",
+      "evidence": "Prompt generate applied parsed grade/count/difficulty chips",
+      "details": "Grade 2\nOperations and Fluency\nQuick Check\n12 questions\nChallenge"
+    },
+    {
+      "id": "STATE-001",
+      "status": "passed",
+      "evidence": "Generated prompt state is reflected in URL params",
+      "details": "http://127.0.0.1:4173/?p=Grade+2+addition+facts+fluency+exit+ticket+with+20+problems+hard&grade=2&strand=Operations+and+Fluency&type=addition-facts-fluency&format=quick-check&count=12&difficulty=challenge"
+    },
+    {
+      "id": "REVIEW-003",
+      "status": "passed",
+      "evidence": "Answers tab exposes answer key table",
+      "details": ""
+    },
+    {
+      "id": "EXPORT-004",
+      "status": "passed",
+      "evidence": "JSON tab exposes compact worksheet summary",
+      "details": ""
+    },
+    {
+      "id": "EXPORT-001",
+      "status": "passed",
+      "evidence": "Primary print/export actions remain visible from review panel",
+      "details": ""
+    },
+    {
+      "id": "EXPORT-005",
+      "status": "passed",
+      "evidence": "Print media exposes printable answer-key page",
+      "details": ""
+    },
+    {
+      "id": "UX-TOUCH-001",
+      "status": "passed",
+      "evidence": "Visible desktop buttons keep approximately 40px minimum target size",
+      "details": ""
+    },
+    {
+      "id": "UX-RESPONSIVE-001",
+      "status": "passed",
+      "evidence": "Mobile viewport shows only mobile command layout",
+      "details": ""
+    },
+    {
+      "id": "MOBILE-001",
+      "status": "passed",
+      "evidence": "Mobile Preview tab renders worksheet preview",
+      "details": ""
+    },
+    {
+      "id": "MOBILE-001",
+      "status": "passed",
+      "evidence": "Mobile Review tab renders trust panel",
+      "details": ""
+    },
+    {
+      "id": "MOBILE-001",
+      "status": "passed",
+      "evidence": "Mobile Export tab renders export guidance",
+      "details": ""
+    },
+    {
+      "id": "MOBILE-002",
+      "status": "passed",
+      "evidence": "Mobile command menu opens common actions sheet",
+      "details": ""
+    },
+    {
+      "id": "MOBILE-RESPONSIVE-001",
+      "status": "passed",
+      "evidence": "Mobile layout avoids page-level horizontal overflow",
+      "details": "0"
+    }
+  ]
+}

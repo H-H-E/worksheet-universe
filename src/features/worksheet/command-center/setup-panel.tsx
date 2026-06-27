@@ -78,11 +78,11 @@ export function PromptBar({
           value={intent.prompt}
           onChange={(event) => updateIntent({ prompt: event.target.value })}
           className="prompt-input"
-          placeholder="Make a Grade 5 fractions worksheet…"
+          placeholder="Make a Grade 5 fractions worksheet..."
           autoComplete="off"
           spellCheck
         />
-        <Button type="submit" size="lg">
+        <Button type="submit" size="lg" className="min-h-[40px] min-w-[40px] active:scale-[0.985] active:translate-y-px transition-transform">
           <Sparkles aria-hidden="true" />
           Generate
         </Button>
@@ -122,7 +122,13 @@ export function SetupPanel({
           <p className="eyebrow">Setup</p>
           <h2 id={`${idPrefix}-setup-title`}>Build target</h2>
         </div>
-        <Button type="button" variant="ghost" size="sm" onClick={resetToDefault}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="min-h-[40px] min-w-[40px] active:scale-[0.985] active:translate-y-px transition-transform"
+          onClick={resetToDefault}
+        >
           <RefreshCcw aria-hidden="true" />
           Reset
         </Button>
@@ -135,13 +141,25 @@ export function SetupPanel({
             type="button"
             variant="outline"
             size="sm"
-            className="preset-button"
+            className="preset-button min-h-[40px] min-w-[40px] active:scale-[0.985] active:translate-y-px transition-transform"
             onClick={() => applyPreset(preset)}
           >
             <span>{preset.title}</span>
             <small>{preset.summary}</small>
           </Button>
         ))}
+      </div>
+
+      <div className="field-group">
+        <Label htmlFor={`${idPrefix}-skill-search`}>Skill search</Label>
+        <Input
+          id={`${idPrefix}-skill-search`}
+          name="skill-search"
+          value={intent.skillQuery}
+          onChange={(event) => updateIntent({ skillQuery: event.target.value })}
+          autoComplete="off"
+          placeholder="fractions, equations, place value"
+        />
       </div>
 
       <div className="field-group">
@@ -153,6 +171,7 @@ export function SetupPanel({
               type="button"
               variant={intent.exactGrade === grade.id ? "default" : "outline"}
               size="sm"
+              className="min-h-[40px] min-w-[40px] active:scale-[0.985] active:translate-y-px transition-transform"
               onClick={() => updateIntent({ exactGrade: grade.id }, true)}
             >
               {grade.label}
@@ -178,93 +197,106 @@ export function SetupPanel({
 
       <div className="field-group">
         <Label>Generator</Label>
+        <div className="selected-generator">
+          <span>Selected</span>
+          <strong>{activeType.title}</strong>
+          <small>{activeType.summary}</small>
+        </div>
         <div className="generator-list" aria-label={`${visibleTypes.length} matching generators`}>
-          {visibleTypes.slice(0, 10).map((type) => (
+          {visibleTypes.slice(0, 6).map((type) => (
             <button
               key={type.id}
               type="button"
-              className={cn("generator-option", activeType.id === type.id && "is-active")}
+              className={cn("generator-option min-h-[40px] active:scale-[0.985] active:translate-y-px transition-transform", activeType.id === type.id && "is-active")}
               onClick={() => updateIntent({ typeId: type.id, strand: type.strand, format: type.formats.includes(intent.format) ? intent.format : type.formats[0] }, true)}
             >
               <span>{type.title}</span>
               <small>{type.strand}</small>
             </button>
           ))}
+          {visibleTypes.length === 0 ? (
+            <p className="empty-generator-state">No generators match these filters.</p>
+          ) : null}
         </div>
-        <p className="result-count"><Filter className="size-3.5" aria-hidden="true" /> {visibleTypes.length} matches</p>
+        <p className="result-count"><Filter className="size-3.5" aria-hidden="true" /> Showing {Math.min(visibleTypes.length, 6)} of {visibleTypes.length}</p>
       </div>
 
-      <div className="two-column-fields">
-        <div className="field-group">
-          <Label htmlFor={`${idPrefix}-format`}>Format</Label>
-          <Select value={intent.format} onValueChange={(value) => updateIntent({ format: value as CommandCenterIntent["format"] }, true)}>
-            <SelectTrigger id={`${idPrefix}-format`}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {formatFamilies.filter((format) => activeType.formats.includes(format.id)).map((format) => (
-                <SelectItem key={format.id} value={format.id}>{format.title}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <details className="fine-tuning-panel">
+        <summary>Fine-tune worksheet details</summary>
+        <div className="fine-tuning-fields">
+          <div className="two-column-fields">
+            <div className="field-group">
+              <Label htmlFor={`${idPrefix}-format`}>Format</Label>
+              <Select value={intent.format} onValueChange={(value) => updateIntent({ format: value as CommandCenterIntent["format"] }, true)}>
+                <SelectTrigger id={`${idPrefix}-format`}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {formatFamilies.filter((format) => activeType.formats.includes(format.id)).map((format) => (
+                    <SelectItem key={format.id} value={format.id}>{format.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div className="field-group">
-          <Label htmlFor={`${idPrefix}-difficulty`}>Difficulty target</Label>
-          <Select value={intent.difficulty} onValueChange={(value) => updateIntent({ difficulty: value as DifficultyTarget })}>
-            <SelectTrigger id={`${idPrefix}-difficulty`}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="readiness">Readiness</SelectItem>
-              <SelectItem value="core">Core</SelectItem>
-              <SelectItem value="challenge">Challenge</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+            <div className="field-group">
+              <Label htmlFor={`${idPrefix}-difficulty`}>Difficulty target</Label>
+              <Select value={intent.difficulty} onValueChange={(value) => updateIntent({ difficulty: value as DifficultyTarget })}>
+                <SelectTrigger id={`${idPrefix}-difficulty`}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="readiness">Readiness</SelectItem>
+                  <SelectItem value="core">Core</SelectItem>
+                  <SelectItem value="challenge">Challenge</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-      <div className="three-column-fields">
-        <div className="field-group">
-          <Label htmlFor={`${idPrefix}-count`}>Questions</Label>
-          <Input
-            id={`${idPrefix}-count`}
-            name="question-count"
-            type="number"
-            inputMode="numeric"
-            autoComplete="off"
-            min={3}
-            max={12}
-            value={intent.itemCount}
-            onChange={(event) => updateIntent({ itemCount: Number(event.target.value) || 3 }, true)}
-          />
+          <div className="three-column-fields">
+            <div className="field-group">
+              <Label htmlFor={`${idPrefix}-count`}>Questions</Label>
+              <Input
+                id={`${idPrefix}-count`}
+                name="question-count"
+                type="number"
+                inputMode="numeric"
+                autoComplete="off"
+                min={3}
+                max={12}
+                value={intent.itemCount}
+                onChange={(event) => updateIntent({ itemCount: Number(event.target.value) || 3 }, true)}
+              />
+            </div>
+            <div className="field-group">
+              <Label htmlFor={`${idPrefix}-seed`}>Seed</Label>
+              <Input
+                id={`${idPrefix}-seed`}
+                name="worksheet-seed"
+                type="number"
+                inputMode="numeric"
+                autoComplete="off"
+                min={1}
+                value={intent.seed}
+                onChange={(event) => updateIntent({ seed: Number(event.target.value) || 1 }, true)}
+              />
+            </div>
+            <div className="field-group">
+              <Label htmlFor={`${idPrefix}-page-size`}>Page</Label>
+              <Select value={intent.pageSize} onValueChange={(value) => updateIntent({ pageSize: value as PageSize })}>
+                <SelectTrigger id={`${idPrefix}-page-size`}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="letter">Letter</SelectItem>
+                  <SelectItem value="a4">A4</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
-        <div className="field-group">
-          <Label htmlFor={`${idPrefix}-seed`}>Seed</Label>
-          <Input
-            id={`${idPrefix}-seed`}
-            name="worksheet-seed"
-            type="number"
-            inputMode="numeric"
-            autoComplete="off"
-            min={1}
-            value={intent.seed}
-            onChange={(event) => updateIntent({ seed: Number(event.target.value) || 1 }, true)}
-          />
-        </div>
-        <div className="field-group">
-          <Label htmlFor={`${idPrefix}-page-size`}>Page</Label>
-          <Select value={intent.pageSize} onValueChange={(value) => updateIntent({ pageSize: value as PageSize })}>
-            <SelectTrigger id={`${idPrefix}-page-size`}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="letter">Letter</SelectItem>
-              <SelectItem value="a4">A4</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      </details>
     </section>
   );
 }

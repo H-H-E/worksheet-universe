@@ -1,0 +1,178 @@
+{
+  "results": [
+    {
+      "id": "APP-001",
+      "status": "passed",
+      "evidence": "DOM harness rendered command center root and workspace",
+      "details": ""
+    },
+    {
+      "id": "REVIEW-001",
+      "status": "passed",
+      "evidence": "Default worksheet audit passed in trust state",
+      "details": ""
+    },
+    {
+      "id": "PROMPT-001",
+      "status": "passed",
+      "evidence": "Prompt chips reflected grade, count clamp, and difficulty",
+      "details": ""
+    },
+    {
+      "id": "PROMPT-002",
+      "status": "passed",
+      "evidence": "Generate applied parsed prompt to active type and item count",
+      "details": ""
+    },
+    {
+      "id": "STATE-001",
+      "status": "passed",
+      "evidence": "URL params encode generated active type",
+      "details": ""
+    },
+    {
+      "id": "SETUP-001",
+      "status": "passed",
+      "evidence": "Bell Ringer preset set count to 5 and status updated",
+      "details": ""
+    },
+    {
+      "id": "SETUP-002",
+      "status": "passed",
+      "evidence": "Skill search result count displayed:  Showing 0 of 0",
+      "details": ""
+    },
+    {
+      "id": "SETUP-003",
+      "status": "passed",
+      "evidence": "Grade 4 button updated normalized intent",
+      "details": ""
+    },
+    {
+      "id": "SETUP-002",
+      "status": "passed",
+      "evidence": "Incompatible filters show an explicit no-match state instead of unrelated generators",
+      "details": "visibleTypes=0; result= Showing 0 of 0; body=Worksheet UniverseMixed Operations Practice / 5 questions / seed 42Teacher intentGrade 2 addition facts fluency exit ticket with 20 problems hardGenerateGrade 2Operations and FluencyQuick Check12 questionsChallengeSetupBuild targetResetBell Ringer5 minutesHomework Practicesteady practiceDiagnosticincreasing demandSkill searchExact gradePre-KK123456789101112Topic strandOperations and FluencyGeneratorSelectedMixed Operations PracticeMix addition, subtraction, multiplication, and division by grade "
+    },
+    {
+      "id": "SETUP-005",
+      "status": "passed",
+      "evidence": "Generator selection activated Fraction Models and Manipulatives",
+      "details": ""
+    },
+    {
+      "id": "SETUP-008",
+      "status": "passed",
+      "evidence": "Question count normalized to 12",
+      "details": ""
+    },
+    {
+      "id": "SETUP-009",
+      "status": "passed",
+      "evidence": "Seed 99999 wrapped to 1 after making another",
+      "details": ""
+    },
+    {
+      "id": "VERSION-001",
+      "status": "passed",
+      "evidence": "Make another regenerated worksheet and updated status",
+      "details": ""
+    },
+    {
+      "id": "SETUP-010",
+      "status": "passed",
+      "evidence": "A4 page class applied after page size update",
+      "details": ""
+    },
+    {
+      "id": "SETUP-011",
+      "status": "passed",
+      "evidence": "Reset restored default fraction model generator",
+      "details": ""
+    },
+    {
+      "id": "PREVIEW-001",
+      "status": "passed",
+      "evidence": "Student preview rendered worksheet header and content",
+      "details": ""
+    },
+    {
+      "id": "PREVIEW-002",
+      "status": "passed",
+      "evidence": "Fraction visual block rendered in preview",
+      "details": ""
+    },
+    {
+      "id": "PREVIEW-003",
+      "status": "passed",
+      "evidence": "Per-question answer check accepted 1/2",
+      "details": ""
+    },
+    {
+      "id": "PREVIEW-004",
+      "status": "passed",
+      "evidence": "Lock action toggled accessible label to Unlock q1",
+      "details": ""
+    },
+    {
+      "id": "PREVIEW-005",
+      "status": "passed",
+      "evidence": "Per-question refresh generated another version",
+      "details": ""
+    },
+    {
+      "id": "REVIEW-002",
+      "status": "passed",
+      "evidence": "Check all action updated trust status",
+      "details": ""
+    },
+    {
+      "id": "REVIEW-003",
+      "status": "passed",
+      "evidence": "Answers tab exposed answer key table",
+      "details": ""
+    },
+    {
+      "id": "EXPORT-004",
+      "status": "passed",
+      "evidence": "JSON tab exposed compact worksheet summary",
+      "details": ""
+    },
+    {
+      "id": "EXPORT-003",
+      "status": "passed",
+      "evidence": "Copy JSON wrote canonical worksheet JSON to clipboard stub",
+      "details": ""
+    },
+    {
+      "id": "EXPORT-001",
+      "status": "passed",
+      "evidence": "Print modes called: student|answer-key|all",
+      "details": ""
+    },
+    {
+      "id": "EXPORT-002",
+      "status": "passed",
+      "evidence": "Print mode reset to student",
+      "details": ""
+    },
+    {
+      "id": "MOBILE-001",
+      "status": "blocked",
+      "evidence": "Real browser unavailable; mobile CSS/tab flow requires viewport/media evaluation beyond happy-dom.",
+      "details": "Chromium/Firefox missing host libraries and install-deps requires sudo."
+    },
+    {
+      "id": "MOBILE-002",
+      "status": "blocked",
+      "evidence": "Real browser unavailable; mobile sheet/menu behavior requires viewport/media evaluation beyond happy-dom.",
+      "details": "Chromium/Firefox missing host libraries and install-deps requires sudo."
+    },
+    {
+      "id": "BROWSER-RUNNER",
+      "status": "blocked",
+      "evidence": "Playwright browser launch blocked by missing libatk/libgtk/pango/cairo/asound libraries; install-deps requires sudo.",
+      "details": "See output/playwright/feature-story-browser-error.txt"
+    }
+  ]
+}

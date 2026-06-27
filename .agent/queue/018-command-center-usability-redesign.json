@@ -1,0 +1,38 @@
+{
+  "id": "018-command-center-usability-redesign",
+  "title": "Redo command center for usability",
+  "branch": "agent/018-command-center-usability-redesign",
+  "priority": 18,
+  "status": "passed",
+  "lane": "frontend",
+  "allowed_paths": [
+    ".agent/queue",
+    ".agent/reports",
+    "README.md",
+    "src",
+    "tests"
+  ],
+  "forbidden_paths": [".git", "node_modules", ".env", ".vercel/project.json"],
+  "goal": "Improve the Next.js worksheet command center usability by reducing cognitive load, making the primary generate-preview-export flow obvious, and preserving the JSON-first worksheet compiler.",
+  "context": "The previous command-center implementation exposed too many controls at once and made the worksheet preview compete with setup and audit panels. The redo should follow the impeccable product UI register: familiar controls, restrained visual design, predictable layout, fewer simultaneous decisions, and task-first hierarchy.",
+  "acceptance": [
+    "The desktop UI has a clear primary flow: teacher intent, tuning controls, live worksheet preview, review/export actions",
+    "The preview is visually cleaner and resembles the final worksheet before digital checking controls are expanded",
+    "Generator selection is searchable and less cognitively heavy than the previous full control wall",
+    "Review and export actions are visible without forcing users to discover a hidden tab",
+    "Mobile keeps a step workflow with concise labels and usable action placement",
+    "Worksheet JSON schema and deterministic generation remain unchanged",
+    "Frontend tests and required checks pass"
+  ],
+  "commands": [
+    "node scripts/agent-validate.mjs",
+    "npm run lint",
+    "npm run typecheck",
+    "npm run test",
+    "npm run test:generators",
+    "npm run build"
+  ],
+  "max_attempts": 2,
+  "depends_on": ["017-next-command-center-frontend"],
+  "notes": "Do not add auth, accounts, databases, AI APIs, LMS integration, or non-JSON worksheet content paths."
+}

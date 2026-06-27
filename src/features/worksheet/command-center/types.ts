@@ -9,6 +9,7 @@ export type PageSize = "letter" | "a4";
 
 export interface CommandCenterIntent {
   prompt: string;
+  skillQuery: string;
   exactGrade: ExactGradeId | "";
   strand: Strand | "";
   typeId: string;
