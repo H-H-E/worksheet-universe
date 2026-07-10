@@ -4,7 +4,7 @@ Status: passed
 
 ## Summary
 
-Used `docs/feature-user-stories.csv` as the product source of truth for a continuation UI/UX pass on the Worksheet Universe command center. The desktop command center now reads as a concrete workflow: Teacher intent, Setup, Preview, Review, Export. Setup keeps the high-frequency controls visible while moving lower-frequency tuning into a native disclosure. The worksheet preview now looks more like the printable student page by default, with per-question digital checks available behind a disclosure. Review/export actions remain visible, with student printing promoted as the primary action.
+Used `docs/feature-user-stories.csv` as the product source of truth for a continuation UI/UX pass on the Worksheet Universe command center. The desktop command center now reads as a concrete workflow: Teacher intent, Setup, Preview, Review, Export. Setup keeps the high-frequency controls visible while moving lower-frequency tuning into a native disclosure. The worksheet preview now looks more like the printable student page by default, with per-question digital checks available behind a disclosure. Review/export actions remain visible, with student printing promoted as the primary action. A follow-up mobile simplification replaced the dense mobile tab stack with an Intent, Setup, Preview, Use carousel and contextual Back, Next, and Print actions.
 
 The worksheet JSON schema, deterministic generation, answer audit, URL-backed state, and generator behavior remain unchanged.
 
@@ -46,7 +46,7 @@ The worksheet JSON schema, deterministic generation, answer audit, URL-backed st
 
 ## Scope Exception
 
-`docs/feature-user-stories.csv` is outside task 018 `allowed_paths`, but updating it was required because the user explicitly made the spreadsheet the canonical source of truth. PREVIEW-003 now states that per-question digital checking is available after expanding the `Digital answer check` disclosure, matching the cleaner print-first preview required by task 018.
+`docs/feature-user-stories.csv` is outside task 018 `allowed_paths`, but updating it was required because the user explicitly made the spreadsheet the canonical source of truth. PREVIEW-003 now states that per-question digital checking is available after expanding the `Digital answer check` disclosure, matching the cleaner print-first preview required by task 018. MOBILE-001 now records the mobile density issue, carousel root-cause fix, regression evidence, and retest result for the Intent, Setup, Preview, Use mobile workflow.
 
 ## Changes
 
@@ -58,14 +58,17 @@ The worksheet JSON schema, deterministic generation, answer audit, URL-backed st
 - Fixed mobile export tab state so inner trust-panel tabs remain controllable.
 - Fixed print CSS so the desktop frame wrapper is restored for print output at narrow page widths.
 - Fixed reduced-motion and non-animated question-action reveal so lock/refresh controls regain pointer events.
+- Replaced the mobile setup/preview/review/export tab stack with a focused carousel: Intent for prompt and draft summary, Setup for generator controls, Preview for the worksheet page, and Use for review/export actions.
+- Replaced persistent mobile New/Print actions with contextual Back/Next navigation and a final Print action on the Use pane.
 - Added regression assertions for workflow rail, disclosures, primary export, print frame restoration, mobile export panel state, touch targets, responsive exclusivity, and reduced-motion action availability.
+- Added regression assertions for the mobile carousel structure, single Use panel, and Back/Next/Print action model.
 
 ## Commands Run
 
 - `node scripts/agent-validate.mjs`: passed, with existing unrelated queue/state warnings.
 - `npm run lint`: passed.
 - `npm run typecheck`: passed.
-- `npm run test`: passed.
+- `npm run test`: passed, including the mobile carousel regression guard.
 - `npm run test:generators`: passed; 139 worksheet types and 834 generated items checked.
 - `npm run build`: passed; route `/` prerendered as static content.
 
@@ -75,13 +78,35 @@ The worksheet JSON schema, deterministic generation, answer audit, URL-backed st
 - Preview is visually cleaner and resembles the final worksheet before digital checking controls are expanded: passed.
 - Generator selection is searchable and less cognitively heavy: passed.
 - Review and export actions are visible without forcing hidden-tab discovery: passed.
-- Mobile keeps a step workflow with concise labels and usable action placement: passed.
+- Mobile keeps a step workflow with concise labels and usable action placement: passed; the mobile view now uses the Intent, Setup, Preview, Use carousel with contextual Back/Next/Print actions.
 - Worksheet JSON schema and deterministic generation remain unchanged: passed.
 - Frontend tests and required checks pass: passed.
 
 ## Remaining Work
 
 - None for task 018.
+
+## Stitch Reference Continuation (2026-07-10)
+
+Status: passed
+
+Applied the supplied `stitch_worksheet_universe_redesign.zip` visual direction to the existing command center without changing worksheet generation or the Worksheet JSON contract. Desktop now uses a fixed control rail, a fluid paper-first preview workspace, and a compact review rail. The palette, borders, radii, elevation, and active states now follow the reference's restrained blue professional system. Mobile retains the existing four-step Intent, Setup, Preview, Use workflow.
+
+Files changed in this continuation:
+
+- `src/app/globals.css`
+- `src/features/worksheet/command-center/WorksheetCommandCenter.tsx`
+- `.agent/reports/018-command-center-usability-redesign.md`
+
+Verification:
+
+- `npm run typecheck`: passed.
+- focused ESLint for `WorksheetCommandCenter.tsx`: passed.
+- `npm run test`: passed, 19/19.
+- `npm run test:generators`: passed, 139 worksheet types and 834 generated items.
+- `npm run build`: passed.
+- full `npm run lint`: blocked by the pre-existing untracked `output/playwright/refresh-real-browser.cjs`, which is outside task 018 allowed paths and was left untouched.
+- `node scripts/agent-validate.mjs`: task-independent failure from the existing task 019 result command declaration; task 018 changes were not implicated.
 
 ## Logs
 

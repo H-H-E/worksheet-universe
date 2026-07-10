@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { BookOpenCheck, FileText, Menu, Printer, RefreshCcw } from "lucide-react";
+import { BookOpenCheck, ChevronLeft, ChevronRight, FileText, Menu, Printer, RefreshCcw } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,14 @@ import {
 import { WorksheetPreview } from "./worksheet-preview";
 
 type PrintMode = "student" | "answer-key" | "all";
+type MobileStep = "intent" | "setup" | "preview" | "use";
+
+const mobileSteps: Array<{ id: MobileStep; label: string }> = [
+  { id: "intent", label: "Intent" },
+  { id: "setup", label: "Setup" },
+  { id: "preview", label: "Preview" },
+  { id: "use", label: "Use" }
+];
 
 export function WorksheetCommandCenter() {
   const router = useRouter();
@@ -44,7 +52,7 @@ export function WorksheetCommandCenter() {
   const [checks, setChecks] = useState<ChecksByQuestion>({});
   const [lockedQuestionIds, setLockedQuestionIds] = useState<string[]>([]);
   const [copyStatus, setCopyStatus] = useState("Ready.");
-  const [mobileStep, setMobileStep] = useState("setup");
+  const [mobileStep, setMobileStep] = useState<MobileStep>("intent");
 
   const fallback = useMemo(() => defaultCommandCenterIntent(worksheetTypes), []);
   const parsedPrompt = useMemo(() => parseWorksheetPrompt(intent.prompt, worksheetTypes), [intent.prompt]);
@@ -166,10 +174,24 @@ export function WorksheetCommandCenter() {
     updateIntent({ activePanel: panel });
   }
 
+  const mobileStepIndex = mobileSteps.findIndex((step) => step.id === mobileStep);
+  const activeMobileStep = mobileSteps[mobileStepIndex] || mobileSteps[0];
+
   function setMobileWorkflowStep(step: string) {
+    if (!isMobileStep(step)) return;
     setMobileStep(step);
-    if (step === "export") setActivePanel("export");
-    if (step === "review" && intent.activePanel === "export") setActivePanel("trust");
+    if (step === "use") setActivePanel("export");
+    if (step === "preview" && intent.activePanel === "export") setActivePanel("trust");
+  }
+
+  function goToPreviousMobileStep() {
+    const previousStep = mobileSteps[Math.max(0, mobileStepIndex - 1)]?.id || "intent";
+    setMobileWorkflowStep(previousStep);
+  }
+
+  function goToNextMobileStep() {
+    const nextStep = mobileSteps[Math.min(mobileSteps.length - 1, mobileStepIndex + 1)]?.id || "use";
+    setMobileWorkflowStep(nextStep);
   }
 
   return (
@@ -230,103 +252,108 @@ export function WorksheetCommandCenter() {
 
       <main id="command-workspace" className="relative">
         <div className="command-mobile lg:hidden rounded-[1rem] border border-border/80 bg-background/95 p-1 shadow-[0_16px_36px_-30px_rgba(0,0,0,0.4)]">
-          <PromptBar idPrefix="mobile" intent={intent} parsedPrompt={parsedPrompt} updateIntent={updateIntent} applyPrompt={applyPrompt} />
+          <div className="mobile-carousel-header">
+            <div>
+              <p className="eyebrow">Step {mobileStepIndex + 1} of {mobileSteps.length}</p>
+              <h2>{activeMobileStep.label}</h2>
+            </div>
+            <Badge variant={audit.ok ? "success" : "warning"}>{audit.ok ? "Ready" : "Review"}</Badge>
+          </div>
           <Tabs value={mobileStep} onValueChange={setMobileWorkflowStep}>
-            <TabsList className="mobile-tabs">
-              <TabsTrigger value="setup">Setup</TabsTrigger>
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-              <TabsTrigger value="review">Review</TabsTrigger>
-              <TabsTrigger value="export">Export</TabsTrigger>
+            <TabsList className="mobile-tabs mobile-carousel-tabs" aria-label="Mobile worksheet carousel">
+              {mobileSteps.map((step) => (
+                <TabsTrigger key={step.id} value={step.id}>{step.label}</TabsTrigger>
+              ))}
             </TabsList>
-            <TabsContent value="setup">
-              <SetupPanel
-                idPrefix="mobile"
-                intent={intent}
-                activeType={activeType}
-                visibleTypes={visibleTypes}
-                updateIntent={updateIntent}
-                applyPreset={applyPreset}
-                resetToDefault={resetToDefault}
-              />
-            </TabsContent>
-            <TabsContent value="preview">
-              <div className="rounded-[0.85rem] border border-border/70 bg-card/60 p-2 shadow-[0_10px_24px_-24px_rgba(0,0,0,0.35)]">
-                <WorksheetPreview
-                  worksheet={worksheet}
-                  pageSize={intent.pageSize}
-                  answers={answers}
-                  checks={checks}
-                  lockedQuestionIds={lockedQuestionIds}
-                  setAnswers={setAnswers}
-                  setChecks={setChecks}
-                  toggleQuestionLock={toggleQuestionLock}
-                  requestNewVersion={makeAnother}
+            <div className="mobile-carousel-window">
+              <TabsContent value="intent" className="mobile-carousel-panel">
+                <PromptBar idPrefix="mobile" intent={intent} parsedPrompt={parsedPrompt} updateIntent={updateIntent} applyPrompt={applyPrompt} />
+                <div className="mobile-draft-card" aria-label="Current mobile draft">
+                  <SummaryItem label="Skill" value={activeType.title} />
+                  <SummaryItem label="Questions" value={String(intent.itemCount)} />
+                  <SummaryItem label="Page" value={intent.pageSize.toUpperCase()} />
+                  <SummaryItem label="Seed" value={String(intent.seed)} />
+                </div>
+              </TabsContent>
+              <TabsContent value="setup" className="mobile-carousel-panel">
+                <SetupPanel
+                  idPrefix="mobile"
+                  intent={intent}
+                  activeType={activeType}
+                  visibleTypes={visibleTypes}
+                  updateIntent={updateIntent}
+                  applyPreset={applyPreset}
+                  resetToDefault={resetToDefault}
                 />
-              </div>
-            </TabsContent>
-            <TabsContent value="review">
-              <TrustPanel
-                idPrefix="mobile"
-                worksheet={worksheet}
-                audit={audit}
-                checks={checks}
-                activePanel={intent.activePanel}
-                copyStatus={copyStatus}
-                setActivePanel={setActivePanel}
-                checkAll={checkAll}
-                printStudent={() => printWithMode("student")}
-                printAnswerKey={() => printWithMode("answer-key")}
-                printAll={() => printWithMode("all")}
-                copyJson={copyJson}
-                makeAnother={makeAnother}
-              />
-            </TabsContent>
-            <TabsContent value="export">
-              <TrustPanel
-                idPrefix="mobile-export"
-                worksheet={worksheet}
-                audit={audit}
-                checks={checks}
-                activePanel={intent.activePanel}
-                copyStatus={copyStatus}
-                setActivePanel={setActivePanel}
-                checkAll={checkAll}
-                printStudent={() => printWithMode("student")}
-                printAnswerKey={() => printWithMode("answer-key")}
-                printAll={() => printWithMode("all")}
-                copyJson={copyJson}
-                makeAnother={makeAnother}
-              />
-            </TabsContent>
+              </TabsContent>
+              <TabsContent value="preview" className="mobile-carousel-panel">
+                <div className="mobile-preview-frame">
+                  <WorksheetPreview
+                    worksheet={worksheet}
+                    pageSize={intent.pageSize}
+                    answers={answers}
+                    checks={checks}
+                    lockedQuestionIds={lockedQuestionIds}
+                    setAnswers={setAnswers}
+                    setChecks={setChecks}
+                    toggleQuestionLock={toggleQuestionLock}
+                    requestNewVersion={makeAnother}
+                  />
+                </div>
+              </TabsContent>
+              <TabsContent value="use" className="mobile-carousel-panel">
+                <TrustPanel
+                  idPrefix="mobile-use"
+                  worksheet={worksheet}
+                  audit={audit}
+                  checks={checks}
+                  activePanel={intent.activePanel}
+                  copyStatus={copyStatus}
+                  setActivePanel={setActivePanel}
+                  checkAll={checkAll}
+                  printStudent={() => printWithMode("student")}
+                  printAnswerKey={() => printWithMode("answer-key")}
+                  printAll={() => printWithMode("all")}
+                  copyJson={copyJson}
+                  makeAnother={makeAnother}
+                />
+              </TabsContent>
+            </div>
           </Tabs>
         </div>
 
-        <div className="command-desktop-frame hidden lg:block rounded-[1.8rem] border border-border/65 bg-muted/35 p-2 shadow-[0_24px_58px_-40px_rgba(0,0,0,0.38)]">
+        <div className="command-desktop-frame hidden lg:block">
           <div className="command-desktop hidden lg:grid">
-            <section className="command-control-deck no-print rounded-[1.25rem] border border-border/55 bg-card/90 shadow-[0_10px_28px_-24px_rgba(0,0,0,0.3)]">
-              <PromptBar idPrefix="desktop" intent={intent} parsedPrompt={parsedPrompt} updateIntent={updateIntent} applyPrompt={applyPrompt} />
-              <div className="workflow-panel">
-                <div className="workflow-heading">
-                  <p className="eyebrow">Workflow</p>
-                  <strong>{audit.ok ? "Ready to print" : "Review before export"}</strong>
-                </div>
-                <ol className="workflow-rail" aria-label="Workflow status">
-                  <WorkflowStep label="Teacher intent" value={intent.prompt.trim() ? "Parsed" : "Ready"} />
-                  <WorkflowStep label="Setup" value={intent.exactGrade ? `Grade ${intent.exactGrade}` : "Any grade"} />
-                  <WorkflowStep label="Preview" value={`${worksheet.answerKey.length} items`} />
-                  <WorkflowStep label="Review" value={audit.ok ? "Verified" : "Needs review"} />
-                  <WorkflowStep label="Export" value="Student print" />
-                </ol>
-                <div className="flow-summary" aria-label="Current draft summary">
-                  <SummaryItem label="Skill" value={activeType.title} />
-                  <SummaryItem label="Format" value={activeFormat.replaceAll("-", " ")} />
-                  <SummaryItem label="Grade" value={intent.exactGrade || "Any"} />
-                  <SummaryItem label="Status" value={audit.ok ? "Verified" : "Needs review"} />
+            <aside className="command-sidebar no-print">
+              <div className="control-panel-heading">
+                <div className="control-panel-icon" aria-hidden="true"><BookOpenCheck /></div>
+                <div>
+                  <h2>Control panel</h2>
+                  <p>Configure your worksheet</p>
                 </div>
               </div>
-            </section>
-
-            <aside className="command-sidebar no-print rounded-[1.15rem] border border-border/55 bg-card/95 shadow-[0_12px_30px_-30px_rgba(0,0,0,0.3)]">
+              <section className="command-control-deck">
+                <PromptBar idPrefix="desktop" intent={intent} parsedPrompt={parsedPrompt} updateIntent={updateIntent} applyPrompt={applyPrompt} />
+                <div className="workflow-panel">
+                  <div className="workflow-heading">
+                    <p className="eyebrow">Workflow</p>
+                    <strong>{audit.ok ? "Ready to print" : "Review before export"}</strong>
+                  </div>
+                  <ol className="workflow-rail" aria-label="Workflow status">
+                    <WorkflowStep label="Teacher intent" value={intent.prompt.trim() ? "Parsed" : "Ready"} />
+                    <WorkflowStep label="Setup" value={intent.exactGrade ? `Grade ${intent.exactGrade}` : "Any grade"} />
+                    <WorkflowStep label="Preview" value={`${worksheet.answerKey.length} items`} />
+                    <WorkflowStep label="Review" value={audit.ok ? "Verified" : "Needs review"} />
+                    <WorkflowStep label="Export" value="Student print" />
+                  </ol>
+                  <div className="flow-summary" aria-label="Current draft summary">
+                    <SummaryItem label="Skill" value={activeType.title} />
+                    <SummaryItem label="Format" value={activeFormat.replaceAll("-", " ")} />
+                    <SummaryItem label="Grade" value={intent.exactGrade || "Any"} />
+                    <SummaryItem label="Status" value={audit.ok ? "Verified" : "Needs review"} />
+                  </div>
+                </div>
+              </section>
               <SetupPanel
                 idPrefix="desktop"
                 intent={intent}
@@ -338,7 +365,7 @@ export function WorksheetCommandCenter() {
               />
             </aside>
 
-            <section className="command-preview-column rounded-[1.2rem] border border-border/60 bg-background/95 shadow-[0_14px_36px_-30px_rgba(0,0,0,0.34)]" aria-label="Live worksheet preview">
+            <section className="command-preview-column" aria-label="Live worksheet preview">
               <div className="preview-heading no-print">
                 <div>
                   <p className="eyebrow">Preview</p>
@@ -359,7 +386,7 @@ export function WorksheetCommandCenter() {
               />
             </section>
 
-            <aside className="command-inspector no-print rounded-[1.2rem] border border-border/55 bg-card/95 shadow-[0_12px_30px_-30px_rgba(0,0,0,0.3)]">
+            <aside className="command-inspector no-print">
               <TrustPanel
                 idPrefix="desktop"
                 worksheet={worksheet}
@@ -381,14 +408,21 @@ export function WorksheetCommandCenter() {
       </main>
 
       <div className="mobile-action-bar no-print lg:hidden">
-        <Button type="button" variant="outline" onClick={makeAnother}>
-          <RefreshCcw aria-hidden="true" />
-          New
+        <Button type="button" variant="outline" onClick={goToPreviousMobileStep} disabled={mobileStepIndex === 0}>
+          <ChevronLeft aria-hidden="true" />
+          Back
         </Button>
-        <Button type="button" onClick={() => printWithMode("student")}>
-          <Printer aria-hidden="true" />
-          Print
-        </Button>
+        {mobileStep === "use" ? (
+          <Button type="button" onClick={() => printWithMode("student")}>
+            <Printer aria-hidden="true" />
+            Print
+          </Button>
+        ) : (
+          <Button type="button" onClick={goToNextMobileStep}>
+            Next
+            <ChevronRight aria-hidden="true" />
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -410,6 +444,10 @@ function WorkflowStep({ label, value }: { label: string; value: string }) {
       <strong>{value}</strong>
     </li>
   );
+}
+
+function isMobileStep(step: string): step is MobileStep {
+  return mobileSteps.some((item) => item.id === step);
 }
 
 function resolveActiveType(intent: CommandCenterIntent, parsedTypeId: string | undefined, visibleTypes: WorksheetType[]) {
